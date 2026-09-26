@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "status": "pending",
+  "githubUrl": null,
+  "reason": "No authorized GitHub publishing route or destination; assignment prohibits credentials, external services and touching .git/.",
+  "archive": "artifacts/measure-test-quality-source.tar.gz",
+  "archiveSha256": "d08287c2e0fb5dfef4b81f9895f662a9e8a8b6c076b5ab555f70554c5d2f0d34",
+  "files": 34,
+  "excludes": [
+    ".git/",
+    ".github/",
+    ".env*",
+    "node_modules/",
+    "out/",
+    "cache/",
+    "test/scratch/",
+    "archive itself",
+    "publication.json"
+  ],
+  "instruction": "Maintainer may publish the ordinary source files after independent review using docs/MAINTAINERS.md. The archive is local delivery, not GitHub publication."
+}

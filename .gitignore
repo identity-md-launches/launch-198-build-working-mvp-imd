@@ -1,0 +1,7 @@
+out/
+cache/
+!artifacts/
+!artifacts/**
+artifacts/replay/
+*.tar.gz
+!artifacts/measure-test-quality-source.tar.gz

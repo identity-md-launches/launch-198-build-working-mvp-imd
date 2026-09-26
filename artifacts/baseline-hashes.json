@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "description": "Committed byte identity before strengthening tests. Pilot baseline passed 5 tests before final suite existed. Canonical campaigns may use a later runner; this commitment remains unchanged.",
+  "files": [
+    {
+      "path": "foundry.toml",
+      "role": "support",
+      "sha256": "64564564682563bf8a3685e004c25d28659a27a8367a4a2b4dcfde2661d3b77b"
+    },
+    {
+      "path": "src/OrderedRegistry.sol",
+      "role": "source",
+      "sha256": "66f80d3a0990a3cbfb6f0fb138d99cf8f8e0528b5537e4d6ab5e0137083cbf63"
+    },
+    {
+      "path": "test/initial/RegistryInitial.t.sol",
+      "role": "test",
+      "sha256": "b05f03d7f5145a26742966813a66f51957907d3506bc52d0d90a0c8d524f7248"
+    }
+  ],
+  "manifestSha256": "324d20ba6ce5755c99cfb56b1eab38f946b4ac02fd515a16e4071e10f477519d",
+  "toolchainSha256": "612f4ae3aa6b22392500d4073c63782f8b4e0b909c4bb11b43a74ff4c889d95b",
+  "seed": "0x5eed",
+  "baselineValid": true,
+  "executedTests": 5
+}

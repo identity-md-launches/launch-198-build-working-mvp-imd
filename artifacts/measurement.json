@@ -1,0 +1,1990 @@
+{
+  "version": 1,
+  "kind": "measurement",
+  "initial": {
+    "version": 1,
+    "kind": "campaign",
+    "startedAt": "2026-09-26T21:42:39.817Z",
+    "finishedAt": "2026-09-26T21:42:41.079Z",
+    "status": "complete",
+    "frozen": {
+      "files": [
+        {
+          "path": "foundry.toml",
+          "role": "support",
+          "sha256": "64564564682563bf8a3685e004c25d28659a27a8367a4a2b4dcfde2661d3b77b"
+        },
+        {
+          "path": "src/OrderedRegistry.sol",
+          "role": "source",
+          "sha256": "66f80d3a0990a3cbfb6f0fb138d99cf8f8e0528b5537e4d6ab5e0137083cbf63"
+        },
+        {
+          "path": "test/initial/RegistryInitial.t.sol",
+          "role": "test",
+          "sha256": "b05f03d7f5145a26742966813a66f51957907d3506bc52d0d90a0c8d524f7248"
+        }
+      ],
+      "projectSha256": "2a63295fe55f8d286acd182139b1bef7dfc39b58a1ab01d1642bdf12c2f47c51",
+      "manifestSha256": "324d20ba6ce5755c99cfb56b1eab38f946b4ac02fd515a16e4071e10f477519d",
+      "manifest": {
+        "version": 1,
+        "provenance": {
+          "author": "measure-test-quality benchmark author",
+          "origin": "public author-written standalone benchmark; not independent or held out",
+          "createdAt": "2026-09-26T00:00:00Z",
+          "description": "Six non-equivalent single-site defects selected before the initial campaign."
+        },
+        "sourceRoots": [
+          "src"
+        ],
+        "testRoots": [
+          "test"
+        ],
+        "supportPaths": [
+          "foundry.toml"
+        ],
+        "mutations": [
+          {
+            "id": "capacity-overflow",
+            "path": "src/OrderedRegistry.sol",
+            "before": "if (entries.length >= CAPACITY)",
+            "after": "if (entries.length > CAPACITY)",
+            "category": "capacity-boundary",
+            "rationale": "Accepts a fifth entry past the bound.",
+            "relevantTests": [
+              "testCapacity()",
+              "testRefusalBytesAndPrecedence()"
+            ]
+          },
+          {
+            "id": "unstable-delete",
+            "path": "src/OrderedRegistry.sol",
+            "before": "entries[j] = entries[j + 1];",
+            "after": "entries[j] = entries[entries.length - 1];",
+            "category": "ordering",
+            "rationale": "Replaces shifted entries with the last entry, breaking stable order.",
+            "relevantTests": [
+              "testStableOrder()",
+              "testSequences()",
+              "testFuzzSequence(uint256)"
+            ]
+          },
+          {
+            "id": "wrong-zero-error",
+            "path": "src/OrderedRegistry.sol",
+            "before": "if (value == 0) revert ZeroValue();",
+            "after": "if (value == 0) revert Missing(value);",
+            "category": "wrong-error",
+            "rationale": "Returns the wrong refusal selector for zero.",
+            "relevantTests": [
+              "testRefusals()",
+              "testRefusalBytesAndPrecedence()"
+            ]
+          },
+          {
+            "id": "full-before-duplicate",
+            "path": "src/OrderedRegistry.sol",
+            "before": "if (present[value]) revert AlreadyPresent(value);\n        if (entries.length >= CAPACITY) revert Full(CAPACITY);",
+            "after": "if (entries.length >= CAPACITY) revert Full(CAPACITY);\n        if (present[value]) revert AlreadyPresent(value);",
+            "category": "error-precedence",
+            "rationale": "Reports Full instead of AlreadyPresent for duplicate insertion when full.",
+            "relevantTests": [
+              "testRefusalBytesAndPrecedence()"
+            ]
+          },
+          {
+            "id": "stale-membership",
+            "path": "src/OrderedRegistry.sol",
+            "before": "delete present[value];",
+            "after": "present[value] = true;",
+            "category": "stale-state",
+            "rationale": "Leaves removed values marked present.",
+            "relevantTests": [
+              "testRemoveMembership()",
+              "testSequences()",
+              "testFuzzSequence(uint256)"
+            ]
+          },
+          {
+            "id": "truncate-128",
+            "path": "src/OrderedRegistry.sol",
+            "before": "entries.push(value);",
+            "after": "entries.push(uint256(uint128(value)));",
+            "category": "truncation",
+            "rationale": "Truncates observable entries to 128 bits while membership uses 256 bits.",
+            "relevantTests": [
+              "testSmallValues()",
+              "testFullWidthCounterexample()",
+              "testEveryBitBoundary()",
+              "testFuzzFullWidth(uint256)"
+            ]
+          }
+        ]
+      },
+      "seed": "0x5eed",
+      "matchPath": "test/initial/*.t.sol",
+      "runnerSha256": {
+        "compare.mjs": "afe3d11a919eb266599bb2bd8d1ee3c17b3d256c26640aec144429f6bbf06d99",
+        "core.mjs": "de0ffa375c60bd709036407734fcc326b375157b9c48f29c70c733690a7f0288",
+        "run.mjs": "4043e9ae87bb11d52256930da270fd300c5233ed31a3b9741826dda7c170ab2f",
+        "schema.mjs": "96a127ca55736a25a7a5161fd08141013c00c42e7ea2826baeeaed3d52ef80ec",
+        "validate.mjs": "8b09164a7af25e8059b95808ffec1bf9ae038bff775a256bba9f3e99dea8340b"
+      },
+      "tools": {
+        "node": "v22.22.2",
+        "forge": {
+          "command": [
+            "forge",
+            "--version"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 13,
+          "stdout": "forge Version: 1.7.1\nCommit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8\nBuild Timestamp: 2026-05-08T07:50:55.527285345Z (1778226655)\nBuild Profile: dist\n",
+          "stderr": ""
+        },
+        "solc": {
+          "command": [
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--version"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 4,
+          "stdout": "solc, the solidity compiler commandline interface\nVersion: 0.8.24+commit.e11b9ed9.Linux.g++\n",
+          "stderr": ""
+        },
+        "solcBinarySha256": "fb03a29a517452b9f12bcf459ef37d0a543765bb3bbc911e70a87d6a37c30d5f"
+      },
+      "toolchainSha256": "612f4ae3aa6b22392500d4073c63782f8b4e0b909c4bb11b43a74ff4c889d95b"
+    },
+    "bounds": {
+      "timeoutMs": 30000,
+      "campaignMs": 300000,
+      "maxMutations": 32
+    },
+    "baseline": {
+      "valid": true,
+      "reason": "successful compile and nonempty passing test selection",
+      "config": {
+        "command": [
+          "forge",
+          "config",
+          "--json"
+        ],
+        "cwd": "$ISOLATED_PROJECT",
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "interrupted": false,
+        "outputLimited": false,
+        "spawnError": null,
+        "durationMs": 11,
+        "stdout": "{\n  \"src\": \"src\",\n  \"test\": \"test\",\n  \"script\": \"script\",\n  \"out\": \"out\",\n  \"libs\": [],\n  \"remappings\": [],\n  \"auto_detect_remappings\": true,\n  \"libraries\": [],\n  \"cache\": true,\n  \"cache_path\": \"cache\",\n  \"dynamic_test_linking\": false,\n  \"snapshots\": \"snapshots\",\n  \"gas_snapshot_check\": false,\n  \"gas_snapshot_emit\": true,\n  \"broadcast\": \"broadcast\",\n  \"allow_paths\": [],\n  \"include_paths\": [],\n  \"skip\": [],\n  \"force\": false,\n  \"evm_version\": \"paris\",\n  \"hardfork\": null,\n  \"gas_reports\": [\n    \"*\"\n  ],\n  \"gas_reports_ignore\": [],\n  \"gas_reports_include_tests\": false,\n  \"solc\": \"0.8.24\",\n  \"auto_detect_solc\": false,\n  \"offline\": true,\n  \"optimizer\": true,\n  \"optimizer_runs\": 200,\n  \"optimizer_details\": null,\n  \"model_checker\": null,\n  \"verbosity\": 0,\n  \"eth_rpc_url\": null,\n  \"eth_rpc_accept_invalid_certs\": false,\n  \"eth_rpc_no_proxy\": false,\n  \"eth_rpc_jwt\": null,\n  \"eth_rpc_timeout\": null,\n  \"eth_rpc_headers\": null,\n  \"eth_rpc_curl\": false,\n  \"etherscan_api_key\": null,\n  \"ignored_error_codes\": [\n    \"license\",\n    \"code-size\",\n    \"init-code-size\",\n    \"transient-storage\",\n    \"transfer-deprecated\",\n    \"natspec-memory-safe-assembly-deprecated\"\n  ],\n  \"ignored_error_codes_from\": [],\n  \"ignored_warnings_from\": [],\n  \"deny\": \"never\",\n  \"match_test\": null,\n  \"no_match_test\": null,\n  \"match_contract\": null,\n  \"no_match_contract\": null,\n  \"match_path\": null,\n  \"no_match_path\": null,\n  \"no_match_coverage\": null,\n  \"test_failures_file\": \"cache/test-failures\",\n  \"threads\": null,\n  \"show_progress\": false,\n  \"fuzz\": {\n    \"runs\": 64,\n    \"fail_on_revert\": true,\n    \"max_test_rejects\": 65536,\n    \"seed\": \"0x5eed\",\n    \"dictionary_weight\": 40,\n    \"include_storage\": true,\n    \"include_push_bytes\": true,\n    \"max_fuzz_dictionary_addresses\": 15728640,\n    \"max_fuzz_dictionary_values\": 9830400,\n    \"max_fuzz_dictionary_literals\": 6553600,\n    \"gas_report_samples\": 256,\n    \"corpus_dir\": null,\n    \"corpus_gzip\": true,\n    \"corpus_min_mutations\": 5,\n    \"corpus_min_size\": 0,\n    \"show_edge_coverage\": false,\n    \"sancov_edges\": false,\n    \"sancov_trace_cmp\": false,\n    \"failure_persist_dir\": \"cache/fuzz\",\n    \"show_logs\": false,\n    \"timeout\": null\n  },\n  \"invariant\": {\n    \"runs\": 256,\n    \"depth\": 500,\n    \"fail_on_revert\": false,\n    \"call_override\": false,\n    \"dictionary_weight\": 80,\n    \"include_storage\": true,\n    \"include_push_bytes\": true,\n    \"max_fuzz_dictionary_addresses\": 15728640,\n    \"max_fuzz_dictionary_values\": 9830400,\n    \"max_fuzz_dictionary_literals\": 6553600,\n    \"shrink_run_limit\": 5000,\n    \"max_assume_rejects\": 65536,\n    \"gas_report_samples\": 256,\n    \"corpus_dir\": null,\n    \"corpus_gzip\": true,\n    \"corpus_min_mutations\": 5,\n    \"corpus_min_size\": 0,\n    \"show_edge_coverage\": false,\n    \"sancov_edges\": false,\n    \"sancov_trace_cmp\": false,\n    \"failure_persist_dir\": \"cache/invariant\",\n    \"show_metrics\": true,\n    \"timeout\": null,\n    \"show_solidity\": false,\n    \"max_time_delay\": null,\n    \"max_block_delay\": null,\n    \"check_interval\": 1\n  },\n  \"ffi\": false,\n  \"live_logs\": false,\n  \"allow_internal_expect_revert\": false,\n  \"always_use_create_2_factory\": false,\n  \"prompt_timeout\": 120,\n  \"sender\": \"0x1804c8ab1f12e6bbf3894d4083f33e07309d1f38\",\n  \"tx_origin\": \"0x1804c8ab1f12e6bbf3894d4083f33e07309d1f38\",\n  \"initial_balance\": \"0xffffffffffffffffffffffff\",\n  \"block_number\": 1,\n  \"fork_block_number\": null,\n  \"chain_id\": null,\n  \"gas_limit\": 1073741824,\n  \"code_size_limit\": null,\n  \"gas_price\": null,\n  \"block_base_fee_per_gas\": 0,\n  \"block_coinbase\": \"0x0000000000000000000000000000000000000000\",\n  \"block_timestamp\": 1,\n  \"block_difficulty\": 0,\n  \"block_prevrandao\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\n  \"block_gas_limit\": null,\n  \"memory_limit\": 134217728,\n  \"extra_output\": [],\n  \"extra_output_files\": [],\n  \"names\": false,\n  \"sizes\": false,\n  \"via_ir\": false,\n  \"ast\": false,\n  \"rpc_storage_caching\": {\n    \"chains\": \"all\",\n    \"endpoints\": \"all\"\n  },\n  \"no_storage_caching\": false,\n  \"no_rpc_rate_limit\": false,\n  \"use_literal_content\": false,\n  \"bytecode_hash\": \"ipfs\",\n  \"cbor_metadata\": true,\n  \"revert_strings\": null,\n  \"sparse_mode\": false,\n  \"build_info\": false,\n  \"build_info_path\": null,\n  \"fmt\": {\n    \"line_length\": 120,\n    \"tab_width\": 4,\n    \"style\": \"space\",\n    \"bracket_spacing\": false,\n    \"int_types\": \"long\",\n    \"multiline_func_header\": \"attributes_first\",\n    \"quote_style\": \"double\",\n    \"number_underscore\": \"preserve\",\n    \"hex_underscore\": \"remove\",\n    \"single_line_statement_blocks\": \"preserve\",\n    \"override_spacing\": false,\n    \"wrap_comments\": false,\n    \"docs_style\": \"preserve\",\n    \"ignore\": [],\n    \"contract_new_lines\": false,\n    \"sort_imports\": false,\n    \"namespace_import_style\": \"prefer_plain\",\n    \"pow_no_space\": false,\n    \"prefer_compact\": \"all\",\n    \"single_line_imports\": false\n  },\n  \"lint\": {\n    \"severity\": [\n      \"high\",\n      \"medium\",\n      \"low\"\n    ],\n    \"exclude_lints\": [],\n    \"ignore\": [],\n    \"lint_on_build\": true,\n    \"lint_specific\": {\n      \"mixed_case_exceptions\": [\n        \"ERC\",\n        \"URI\",\n        \"ID\",\n        \"URL\",\n        \"API\",\n        \"JSON\",\n        \"XML\",\n        \"HTML\",\n        \"HTTP\",\n        \"HTTPS\"\n      ],\n      \"multi_contract_file_exceptions\": []\n    }\n  },\n  \"doc\": {\n    \"out\": \"docs\",\n    \"title\": \"\",\n    \"book\": \"book.toml\",\n    \"homepage\": \"README.md\",\n    \"ignore\": []\n  },\n  \"bind_json\": {\n    \"out\": \"utils/JsonBindings.sol\",\n    \"include\": [],\n    \"exclude\": []\n  },\n  \"fs_permissions\": [],\n  \"isolate\": false,\n  \"disable_block_gas_limit\": false,\n  \"enable_tx_gas_limit\": false,\n  \"labels\": {},\n  \"unchecked_cheatcode_artifacts\": false,\n  \"create2_library_salt\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\n  \"create2_deployer\": \"0x4e59b44847b379578588920ca78fbf26c0b4956c\",\n  \"vyper\": {},\n  \"dependencies\": null,\n  \"soldeer\": null,\n  \"assertions_revert\": true,\n  \"legacy_assertions\": false,\n  \"network\": null,\n  \"celo\": false,\n  \"bypass_prevrandao\": false,\n  \"transaction_timeout\": 120,\n  \"additional_compiler_profiles\": [],\n  \"compilation_restrictions\": [],\n  \"script_execution_protection\": true\n}\n",
+        "stderr": ""
+      },
+      "build": {
+        "command": [
+          "forge",
+          "build",
+          "--offline",
+          "--use",
+          "/root/.local/share/svm/0.8.24/solc-0.8.24"
+        ],
+        "cwd": "$ISOLATED_PROJECT",
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "interrupted": false,
+        "outputLimited": false,
+        "spawnError": null,
+        "durationMs": 118,
+        "stdout": "Compiling 2 files with Solc 0.8.24\nSolc 0.8.24 finished in 86.00ms\nCompiler run successful!\n",
+        "stderr": ""
+      },
+      "test": {
+        "command": [
+          "forge",
+          "test",
+          "--offline",
+          "--use",
+          "/root/.local/share/svm/0.8.24/solc-0.8.24",
+          "--json",
+          "-vv",
+          "--match-path",
+          "test/initial/*.t.sol",
+          "--fuzz-seed",
+          "0x5eed"
+        ],
+        "cwd": "$ISOLATED_PROJECT",
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "interrupted": false,
+        "outputLimited": false,
+        "spawnError": null,
+        "durationMs": 45,
+        "stdout": "{\"test/initial/RegistryInitial.t.sol:RegistryInitial\":{\"duration\":\"728µs 659ns\",\"test_results\":{\"testCapacity()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":483793}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"200µs 639ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusals()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":276818}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"36µs 840ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRemoveMembership()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":348949}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"43µs 960ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSmallValues()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":345004}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"30µs 770ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testStableOrder()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":448223}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"49µs 520ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+        "stderr": ""
+      },
+      "parsed": {
+        "valid": true,
+        "executed": 5,
+        "tests": [
+          {
+            "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testCapacity()",
+            "name": "testCapacity()",
+            "status": "Success",
+            "reason": null,
+            "counterexample": null
+          },
+          {
+            "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRefusals()",
+            "name": "testRefusals()",
+            "status": "Success",
+            "reason": null,
+            "counterexample": null
+          },
+          {
+            "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRemoveMembership()",
+            "name": "testRemoveMembership()",
+            "status": "Success",
+            "reason": null,
+            "counterexample": null
+          },
+          {
+            "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testSmallValues()",
+            "name": "testSmallValues()",
+            "status": "Success",
+            "reason": null,
+            "counterexample": null
+          },
+          {
+            "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testStableOrder()",
+            "name": "testStableOrder()",
+            "status": "Success",
+            "reason": null,
+            "counterexample": null
+          }
+        ],
+        "error": null
+      }
+    },
+    "mutations": [
+      {
+        "id": "capacity-overflow",
+        "definitionSha256": "f3c1be1c60c8fbd6d7b6025b736f559dbe65de9bdd9c1588f1b47f3bfb04a600",
+        "outcome": "killed",
+        "reason": "relevant explicit assertion failure",
+        "mutatedSourceSha256": "ac2162a530beafb94396d1553888f3bb51a4c6c4fffc2af038e87e878f55228b",
+        "build": {
+          "command": [
+            "forge",
+            "build",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 136,
+          "stdout": "Compiling 2 files with Solc 0.8.24\nSolc 0.8.24 finished in 97.79ms\nCompiler run successful!\n",
+          "stderr": ""
+        },
+        "test": {
+          "command": [
+            "forge",
+            "test",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--json",
+            "-vv",
+            "--match-path",
+            "test/initial/*.t.sol",
+            "--fuzz-seed",
+            "0x5eed"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 39,
+          "stdout": "{\"test/initial/RegistryInitial.t.sol:RegistryInitial\":{\"duration\":\"861µs 799ns\",\"test_results\":{\"testCapacity()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:full registry accepted insertion\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":526076}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"304µs 19ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusals()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":277018}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"55µs 980ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRemoveMembership()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":349155}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"55µs 700ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSmallValues()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":345207}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"46µs 699ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testStableOrder()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":448435}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"72µs 701ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+          "stderr": ""
+        },
+        "parsed": {
+          "valid": true,
+          "executed": 5,
+          "tests": [
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testCapacity()",
+              "name": "testCapacity()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:full registry accepted insertion",
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRefusals()",
+              "name": "testRefusals()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRemoveMembership()",
+              "name": "testRemoveMembership()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testSmallValues()",
+              "name": "testSmallValues()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testStableOrder()",
+              "name": "testStableOrder()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            }
+          ],
+          "error": null
+        },
+        "assertionTests": [
+          "test/initial/RegistryInitial.t.sol:RegistryInitial::testCapacity()"
+        ]
+      },
+      {
+        "id": "unstable-delete",
+        "definitionSha256": "8c924aad691912705584cb9db17d3537dcaa94d6742a6fb82710541b3a93b23a",
+        "outcome": "killed",
+        "reason": "relevant explicit assertion failure",
+        "mutatedSourceSha256": "b1138d8f72361d75bbdcdfbbcb085562c16b7331749f5f5057e047a79f9b0ff4",
+        "build": {
+          "command": [
+            "forge",
+            "build",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 129,
+          "stdout": "Compiling 2 files with Solc 0.8.24\nSolc 0.8.24 finished in 92.65ms\nCompiler run successful!\n",
+          "stderr": ""
+        },
+        "test": {
+          "command": [
+            "forge",
+            "test",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--json",
+            "-vv",
+            "--match-path",
+            "test/initial/*.t.sol",
+            "--fuzz-seed",
+            "0x5eed"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 51,
+          "stdout": "{\"test/initial/RegistryInitial.t.sol:RegistryInitial\":{\"duration\":\"917µs 420ns\",\"test_results\":{\"testCapacity()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":488205}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"289µs 159ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusals()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":281230}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"35µs 100ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRemoveMembership()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":353361}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"40µs 660ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSmallValues()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":349416}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"34µs 200ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testStableOrder()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:stable order\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":491807}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"101µs 699ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+          "stderr": ""
+        },
+        "parsed": {
+          "valid": true,
+          "executed": 5,
+          "tests": [
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testCapacity()",
+              "name": "testCapacity()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRefusals()",
+              "name": "testRefusals()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRemoveMembership()",
+              "name": "testRemoveMembership()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testSmallValues()",
+              "name": "testSmallValues()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testStableOrder()",
+              "name": "testStableOrder()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:stable order",
+              "counterexample": null
+            }
+          ],
+          "error": null
+        },
+        "assertionTests": [
+          "test/initial/RegistryInitial.t.sol:RegistryInitial::testStableOrder()"
+        ]
+      },
+      {
+        "id": "wrong-zero-error",
+        "definitionSha256": "38005bb2da4e528058fd2f6ecbd3e8332c321e5485d2b756819198a5403eb4e9",
+        "outcome": "killed",
+        "reason": "relevant explicit assertion failure",
+        "mutatedSourceSha256": "d8dcc7c9da9f61f10ad32b01d4b4e198d158f1d8318bf31bb76107d1bb64fb09",
+        "build": {
+          "command": [
+            "forge",
+            "build",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 138,
+          "stdout": "Compiling 2 files with Solc 0.8.24\nSolc 0.8.24 finished in 100.17ms\nCompiler run successful!\n",
+          "stderr": ""
+        },
+        "test": {
+          "command": [
+            "forge",
+            "test",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--json",
+            "-vv",
+            "--match-path",
+            "test/initial/*.t.sol",
+            "--fuzz-seed",
+            "0x5eed"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 36,
+          "stdout": "{\"test/initial/RegistryInitial.t.sol:RegistryInitial\":{\"duration\":\"668µs 100ns\",\"test_results\":{\"testCapacity()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":484393}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"166µs 599ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusals()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:zero error\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":277738}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"39µs 270ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRemoveMembership()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":349549}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"45µs 769ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSmallValues()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":345604}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"32µs 651ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testStableOrder()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":448823}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"78µs 620ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+          "stderr": ""
+        },
+        "parsed": {
+          "valid": true,
+          "executed": 5,
+          "tests": [
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testCapacity()",
+              "name": "testCapacity()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRefusals()",
+              "name": "testRefusals()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:zero error",
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRemoveMembership()",
+              "name": "testRemoveMembership()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testSmallValues()",
+              "name": "testSmallValues()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testStableOrder()",
+              "name": "testStableOrder()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            }
+          ],
+          "error": null
+        },
+        "assertionTests": [
+          "test/initial/RegistryInitial.t.sol:RegistryInitial::testRefusals()"
+        ]
+      },
+      {
+        "id": "full-before-duplicate",
+        "definitionSha256": "b2838f01c14b3284c74699a49cdbd7dc4738b61562827424154dd21fd1fb6945",
+        "outcome": "survived",
+        "reason": "all baseline-selected tests passed; equivalence not assessed",
+        "mutatedSourceSha256": "a7da722ff6e694a0ec788233c87457449a7afdc5f6b44d8d31a2260a0899bb56",
+        "build": {
+          "command": [
+            "forge",
+            "build",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 119,
+          "stdout": "Compiling 2 files with Solc 0.8.24\nSolc 0.8.24 finished in 82.96ms\nCompiler run successful!\n",
+          "stderr": ""
+        },
+        "test": {
+          "command": [
+            "forge",
+            "test",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--json",
+            "-vv",
+            "--match-path",
+            "test/initial/*.t.sol",
+            "--fuzz-seed",
+            "0x5eed"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 36,
+          "stdout": "{\"test/initial/RegistryInitial.t.sol:RegistryInitial\":{\"duration\":\"787µs 510ns\",\"test_results\":{\"testCapacity()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":481601}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"226µs 910ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusals()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":276818}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"36µs 629ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRemoveMembership()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":348949}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"53µs 740ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSmallValues()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":345004}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"34µs 369ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testStableOrder()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":448223}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"48µs 980ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+          "stderr": ""
+        },
+        "parsed": {
+          "valid": true,
+          "executed": 5,
+          "tests": [
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testCapacity()",
+              "name": "testCapacity()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRefusals()",
+              "name": "testRefusals()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRemoveMembership()",
+              "name": "testRemoveMembership()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testSmallValues()",
+              "name": "testSmallValues()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testStableOrder()",
+              "name": "testStableOrder()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            }
+          ],
+          "error": null
+        },
+        "assertionTests": []
+      },
+      {
+        "id": "stale-membership",
+        "definitionSha256": "e203e24958744595b41e0dc0c0639eeadd89de475e767b42f1df551619d57536",
+        "outcome": "killed",
+        "reason": "relevant explicit assertion failure",
+        "mutatedSourceSha256": "9d786c514f39669506c08da2812c1963644aafdd3a31798ffb50cb925db0cfe9",
+        "build": {
+          "command": [
+            "forge",
+            "build",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 125,
+          "stdout": "Compiling 2 files with Solc 0.8.24\nSolc 0.8.24 finished in 87.50ms\nCompiler run successful!\n",
+          "stderr": ""
+        },
+        "test": {
+          "command": [
+            "forge",
+            "test",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--json",
+            "-vv",
+            "--match-path",
+            "test/initial/*.t.sol",
+            "--fuzz-seed",
+            "0x5eed"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 36,
+          "stdout": "{\"test/initial/RegistryInitial.t.sol:RegistryInitial\":{\"duration\":\"984µs 781ns\",\"test_results\":{\"testCapacity()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":484805}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"369µs 470ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusals()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":277830}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"50µs\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRemoveMembership()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:stale membership\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":347187}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"57µs 160ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSmallValues()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":346016}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"43µs 670ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testStableOrder()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":469150}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"68µs 290ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+          "stderr": ""
+        },
+        "parsed": {
+          "valid": true,
+          "executed": 5,
+          "tests": [
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testCapacity()",
+              "name": "testCapacity()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRefusals()",
+              "name": "testRefusals()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRemoveMembership()",
+              "name": "testRemoveMembership()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:stale membership",
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testSmallValues()",
+              "name": "testSmallValues()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testStableOrder()",
+              "name": "testStableOrder()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            }
+          ],
+          "error": null
+        },
+        "assertionTests": [
+          "test/initial/RegistryInitial.t.sol:RegistryInitial::testRemoveMembership()"
+        ]
+      },
+      {
+        "id": "truncate-128",
+        "definitionSha256": "20eab15973f620e3ec42021d72041830beb58127b850cb6e486f58a9aff1632c",
+        "outcome": "survived",
+        "reason": "all baseline-selected tests passed; equivalence not assessed",
+        "mutatedSourceSha256": "e332b918770f4d31c00ad95c45a71a8fd8497b26223de1a48ee3ef9936570bde",
+        "build": {
+          "command": [
+            "forge",
+            "build",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 120,
+          "stdout": "Compiling 2 files with Solc 0.8.24\nSolc 0.8.24 finished in 84.84ms\nCompiler run successful!\n",
+          "stderr": "warning[unsafe-typecast]: typecasts that can truncate values should be checked\n   ╭▸ src/OrderedRegistry.sol:21:30\n   │\n21 │         entries.push(uint256(uint128(value)));\n   │                              ━━━━━━━━━━━━━━\n   │\n   ├ note: consider disabling this lint if you're certain the cast is safe\n   │       \n   │       // casting to 'uint128' is safe because [explain why]\n   │       // forge-lint: disable-next-line(unsafe-typecast)\n   │       \n   │       \n   ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#unsafe-typecast\n\n"
+        },
+        "test": {
+          "command": [
+            "forge",
+            "test",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--json",
+            "-vv",
+            "--match-path",
+            "test/initial/*.t.sol",
+            "--fuzz-seed",
+            "0x5eed"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 41,
+          "stdout": "{\"test/initial/RegistryInitial.t.sol:RegistryInitial\":{\"duration\":\"858µs 860ns\",\"test_results\":{\"testCapacity()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":487853}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"277µs 899ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusals()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":280830}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"47µs 701ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRemoveMembership()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":352985}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"57µs 579ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSmallValues()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":349028}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"71µs 579ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testStableOrder()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":452283}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"78µs 871ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+          "stderr": ""
+        },
+        "parsed": {
+          "valid": true,
+          "executed": 5,
+          "tests": [
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testCapacity()",
+              "name": "testCapacity()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRefusals()",
+              "name": "testRefusals()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testRemoveMembership()",
+              "name": "testRemoveMembership()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testSmallValues()",
+              "name": "testSmallValues()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/initial/RegistryInitial.t.sol:RegistryInitial::testStableOrder()",
+              "name": "testStableOrder()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            }
+          ],
+          "error": null
+        },
+        "assertionTests": []
+      }
+    ],
+    "summary": {
+      "counts": {
+        "killed": 4,
+        "survived": 2,
+        "compile-error": 0,
+        "timeout": 0,
+        "infrastructure-error": 0,
+        "not-applicable": 0,
+        "equivalence-unresolved": 0
+      },
+      "total": 6,
+      "denominator": 6,
+      "excluded": 0,
+      "score": 0.6666666666666666,
+      "formula": "killed / (killed + survived)",
+      "limitation": "Evidence about the declared mutations only; not proof of security or semantic equivalence."
+    },
+    "error": null
+  },
+  "final": {
+    "version": 1,
+    "kind": "campaign",
+    "startedAt": "2026-09-26T21:42:41.090Z",
+    "finishedAt": "2026-09-26T21:42:45.158Z",
+    "status": "complete",
+    "frozen": {
+      "files": [
+        {
+          "path": "foundry.toml",
+          "role": "support",
+          "sha256": "64564564682563bf8a3685e004c25d28659a27a8367a4a2b4dcfde2661d3b77b"
+        },
+        {
+          "path": "src/OrderedRegistry.sol",
+          "role": "source",
+          "sha256": "66f80d3a0990a3cbfb6f0fb138d99cf8f8e0528b5537e4d6ab5e0137083cbf63"
+        },
+        {
+          "path": "test/final/RegistryFinal.t.sol",
+          "role": "test",
+          "sha256": "f672f72ed903e1ffa706f47e91d580c9fa6c3519e4fff7ba8a8c127cb8c4f366"
+        },
+        {
+          "path": "test/initial/RegistryInitial.t.sol",
+          "role": "test",
+          "sha256": "b05f03d7f5145a26742966813a66f51957907d3506bc52d0d90a0c8d524f7248"
+        },
+        {
+          "path": "test/support/NaiveRegistryModel.sol",
+          "role": "test",
+          "sha256": "f6b8f7fa7d3cc4e4423368a6ac52394127a6a7eee843044a34b2e012b2f803eb"
+        }
+      ],
+      "projectSha256": "32fca74073fcb5c942f44d963f39d581a29edc0beaeec62a0b363f0a904d685d",
+      "manifestSha256": "324d20ba6ce5755c99cfb56b1eab38f946b4ac02fd515a16e4071e10f477519d",
+      "manifest": {
+        "version": 1,
+        "provenance": {
+          "author": "measure-test-quality benchmark author",
+          "origin": "public author-written standalone benchmark; not independent or held out",
+          "createdAt": "2026-09-26T00:00:00Z",
+          "description": "Six non-equivalent single-site defects selected before the initial campaign."
+        },
+        "sourceRoots": [
+          "src"
+        ],
+        "testRoots": [
+          "test"
+        ],
+        "supportPaths": [
+          "foundry.toml"
+        ],
+        "mutations": [
+          {
+            "id": "capacity-overflow",
+            "path": "src/OrderedRegistry.sol",
+            "before": "if (entries.length >= CAPACITY)",
+            "after": "if (entries.length > CAPACITY)",
+            "category": "capacity-boundary",
+            "rationale": "Accepts a fifth entry past the bound.",
+            "relevantTests": [
+              "testCapacity()",
+              "testRefusalBytesAndPrecedence()"
+            ]
+          },
+          {
+            "id": "unstable-delete",
+            "path": "src/OrderedRegistry.sol",
+            "before": "entries[j] = entries[j + 1];",
+            "after": "entries[j] = entries[entries.length - 1];",
+            "category": "ordering",
+            "rationale": "Replaces shifted entries with the last entry, breaking stable order.",
+            "relevantTests": [
+              "testStableOrder()",
+              "testSequences()",
+              "testFuzzSequence(uint256)"
+            ]
+          },
+          {
+            "id": "wrong-zero-error",
+            "path": "src/OrderedRegistry.sol",
+            "before": "if (value == 0) revert ZeroValue();",
+            "after": "if (value == 0) revert Missing(value);",
+            "category": "wrong-error",
+            "rationale": "Returns the wrong refusal selector for zero.",
+            "relevantTests": [
+              "testRefusals()",
+              "testRefusalBytesAndPrecedence()"
+            ]
+          },
+          {
+            "id": "full-before-duplicate",
+            "path": "src/OrderedRegistry.sol",
+            "before": "if (present[value]) revert AlreadyPresent(value);\n        if (entries.length >= CAPACITY) revert Full(CAPACITY);",
+            "after": "if (entries.length >= CAPACITY) revert Full(CAPACITY);\n        if (present[value]) revert AlreadyPresent(value);",
+            "category": "error-precedence",
+            "rationale": "Reports Full instead of AlreadyPresent for duplicate insertion when full.",
+            "relevantTests": [
+              "testRefusalBytesAndPrecedence()"
+            ]
+          },
+          {
+            "id": "stale-membership",
+            "path": "src/OrderedRegistry.sol",
+            "before": "delete present[value];",
+            "after": "present[value] = true;",
+            "category": "stale-state",
+            "rationale": "Leaves removed values marked present.",
+            "relevantTests": [
+              "testRemoveMembership()",
+              "testSequences()",
+              "testFuzzSequence(uint256)"
+            ]
+          },
+          {
+            "id": "truncate-128",
+            "path": "src/OrderedRegistry.sol",
+            "before": "entries.push(value);",
+            "after": "entries.push(uint256(uint128(value)));",
+            "category": "truncation",
+            "rationale": "Truncates observable entries to 128 bits while membership uses 256 bits.",
+            "relevantTests": [
+              "testSmallValues()",
+              "testFullWidthCounterexample()",
+              "testEveryBitBoundary()",
+              "testFuzzFullWidth(uint256)"
+            ]
+          }
+        ]
+      },
+      "seed": "0x5eed",
+      "matchPath": "test/final/*.t.sol",
+      "runnerSha256": {
+        "compare.mjs": "afe3d11a919eb266599bb2bd8d1ee3c17b3d256c26640aec144429f6bbf06d99",
+        "core.mjs": "de0ffa375c60bd709036407734fcc326b375157b9c48f29c70c733690a7f0288",
+        "run.mjs": "4043e9ae87bb11d52256930da270fd300c5233ed31a3b9741826dda7c170ab2f",
+        "schema.mjs": "96a127ca55736a25a7a5161fd08141013c00c42e7ea2826baeeaed3d52ef80ec",
+        "validate.mjs": "8b09164a7af25e8059b95808ffec1bf9ae038bff775a256bba9f3e99dea8340b"
+      },
+      "tools": {
+        "node": "v22.22.2",
+        "forge": {
+          "command": [
+            "forge",
+            "--version"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 8,
+          "stdout": "forge Version: 1.7.1\nCommit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8\nBuild Timestamp: 2026-05-08T07:50:55.527285345Z (1778226655)\nBuild Profile: dist\n",
+          "stderr": ""
+        },
+        "solc": {
+          "command": [
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--version"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 3,
+          "stdout": "solc, the solidity compiler commandline interface\nVersion: 0.8.24+commit.e11b9ed9.Linux.g++\n",
+          "stderr": ""
+        },
+        "solcBinarySha256": "fb03a29a517452b9f12bcf459ef37d0a543765bb3bbc911e70a87d6a37c30d5f"
+      },
+      "toolchainSha256": "612f4ae3aa6b22392500d4073c63782f8b4e0b909c4bb11b43a74ff4c889d95b"
+    },
+    "bounds": {
+      "timeoutMs": 30000,
+      "campaignMs": 300000,
+      "maxMutations": 32
+    },
+    "baseline": {
+      "valid": true,
+      "reason": "successful compile and nonempty passing test selection",
+      "config": {
+        "command": [
+          "forge",
+          "config",
+          "--json"
+        ],
+        "cwd": "$ISOLATED_PROJECT",
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "interrupted": false,
+        "outputLimited": false,
+        "spawnError": null,
+        "durationMs": 13,
+        "stdout": "{\n  \"src\": \"src\",\n  \"test\": \"test\",\n  \"script\": \"script\",\n  \"out\": \"out\",\n  \"libs\": [],\n  \"remappings\": [],\n  \"auto_detect_remappings\": true,\n  \"libraries\": [],\n  \"cache\": true,\n  \"cache_path\": \"cache\",\n  \"dynamic_test_linking\": false,\n  \"snapshots\": \"snapshots\",\n  \"gas_snapshot_check\": false,\n  \"gas_snapshot_emit\": true,\n  \"broadcast\": \"broadcast\",\n  \"allow_paths\": [],\n  \"include_paths\": [],\n  \"skip\": [],\n  \"force\": false,\n  \"evm_version\": \"paris\",\n  \"hardfork\": null,\n  \"gas_reports\": [\n    \"*\"\n  ],\n  \"gas_reports_ignore\": [],\n  \"gas_reports_include_tests\": false,\n  \"solc\": \"0.8.24\",\n  \"auto_detect_solc\": false,\n  \"offline\": true,\n  \"optimizer\": true,\n  \"optimizer_runs\": 200,\n  \"optimizer_details\": null,\n  \"model_checker\": null,\n  \"verbosity\": 0,\n  \"eth_rpc_url\": null,\n  \"eth_rpc_accept_invalid_certs\": false,\n  \"eth_rpc_no_proxy\": false,\n  \"eth_rpc_jwt\": null,\n  \"eth_rpc_timeout\": null,\n  \"eth_rpc_headers\": null,\n  \"eth_rpc_curl\": false,\n  \"etherscan_api_key\": null,\n  \"ignored_error_codes\": [\n    \"license\",\n    \"code-size\",\n    \"init-code-size\",\n    \"transient-storage\",\n    \"transfer-deprecated\",\n    \"natspec-memory-safe-assembly-deprecated\"\n  ],\n  \"ignored_error_codes_from\": [],\n  \"ignored_warnings_from\": [],\n  \"deny\": \"never\",\n  \"match_test\": null,\n  \"no_match_test\": null,\n  \"match_contract\": null,\n  \"no_match_contract\": null,\n  \"match_path\": null,\n  \"no_match_path\": null,\n  \"no_match_coverage\": null,\n  \"test_failures_file\": \"cache/test-failures\",\n  \"threads\": null,\n  \"show_progress\": false,\n  \"fuzz\": {\n    \"runs\": 64,\n    \"fail_on_revert\": true,\n    \"max_test_rejects\": 65536,\n    \"seed\": \"0x5eed\",\n    \"dictionary_weight\": 40,\n    \"include_storage\": true,\n    \"include_push_bytes\": true,\n    \"max_fuzz_dictionary_addresses\": 15728640,\n    \"max_fuzz_dictionary_values\": 9830400,\n    \"max_fuzz_dictionary_literals\": 6553600,\n    \"gas_report_samples\": 256,\n    \"corpus_dir\": null,\n    \"corpus_gzip\": true,\n    \"corpus_min_mutations\": 5,\n    \"corpus_min_size\": 0,\n    \"show_edge_coverage\": false,\n    \"sancov_edges\": false,\n    \"sancov_trace_cmp\": false,\n    \"failure_persist_dir\": \"cache/fuzz\",\n    \"show_logs\": false,\n    \"timeout\": null\n  },\n  \"invariant\": {\n    \"runs\": 256,\n    \"depth\": 500,\n    \"fail_on_revert\": false,\n    \"call_override\": false,\n    \"dictionary_weight\": 80,\n    \"include_storage\": true,\n    \"include_push_bytes\": true,\n    \"max_fuzz_dictionary_addresses\": 15728640,\n    \"max_fuzz_dictionary_values\": 9830400,\n    \"max_fuzz_dictionary_literals\": 6553600,\n    \"shrink_run_limit\": 5000,\n    \"max_assume_rejects\": 65536,\n    \"gas_report_samples\": 256,\n    \"corpus_dir\": null,\n    \"corpus_gzip\": true,\n    \"corpus_min_mutations\": 5,\n    \"corpus_min_size\": 0,\n    \"show_edge_coverage\": false,\n    \"sancov_edges\": false,\n    \"sancov_trace_cmp\": false,\n    \"failure_persist_dir\": \"cache/invariant\",\n    \"show_metrics\": true,\n    \"timeout\": null,\n    \"show_solidity\": false,\n    \"max_time_delay\": null,\n    \"max_block_delay\": null,\n    \"check_interval\": 1\n  },\n  \"ffi\": false,\n  \"live_logs\": false,\n  \"allow_internal_expect_revert\": false,\n  \"always_use_create_2_factory\": false,\n  \"prompt_timeout\": 120,\n  \"sender\": \"0x1804c8ab1f12e6bbf3894d4083f33e07309d1f38\",\n  \"tx_origin\": \"0x1804c8ab1f12e6bbf3894d4083f33e07309d1f38\",\n  \"initial_balance\": \"0xffffffffffffffffffffffff\",\n  \"block_number\": 1,\n  \"fork_block_number\": null,\n  \"chain_id\": null,\n  \"gas_limit\": 1073741824,\n  \"code_size_limit\": null,\n  \"gas_price\": null,\n  \"block_base_fee_per_gas\": 0,\n  \"block_coinbase\": \"0x0000000000000000000000000000000000000000\",\n  \"block_timestamp\": 1,\n  \"block_difficulty\": 0,\n  \"block_prevrandao\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\n  \"block_gas_limit\": null,\n  \"memory_limit\": 134217728,\n  \"extra_output\": [],\n  \"extra_output_files\": [],\n  \"names\": false,\n  \"sizes\": false,\n  \"via_ir\": false,\n  \"ast\": false,\n  \"rpc_storage_caching\": {\n    \"chains\": \"all\",\n    \"endpoints\": \"all\"\n  },\n  \"no_storage_caching\": false,\n  \"no_rpc_rate_limit\": false,\n  \"use_literal_content\": false,\n  \"bytecode_hash\": \"ipfs\",\n  \"cbor_metadata\": true,\n  \"revert_strings\": null,\n  \"sparse_mode\": false,\n  \"build_info\": false,\n  \"build_info_path\": null,\n  \"fmt\": {\n    \"line_length\": 120,\n    \"tab_width\": 4,\n    \"style\": \"space\",\n    \"bracket_spacing\": false,\n    \"int_types\": \"long\",\n    \"multiline_func_header\": \"attributes_first\",\n    \"quote_style\": \"double\",\n    \"number_underscore\": \"preserve\",\n    \"hex_underscore\": \"remove\",\n    \"single_line_statement_blocks\": \"preserve\",\n    \"override_spacing\": false,\n    \"wrap_comments\": false,\n    \"docs_style\": \"preserve\",\n    \"ignore\": [],\n    \"contract_new_lines\": false,\n    \"sort_imports\": false,\n    \"namespace_import_style\": \"prefer_plain\",\n    \"pow_no_space\": false,\n    \"prefer_compact\": \"all\",\n    \"single_line_imports\": false\n  },\n  \"lint\": {\n    \"severity\": [\n      \"high\",\n      \"medium\",\n      \"low\"\n    ],\n    \"exclude_lints\": [],\n    \"ignore\": [],\n    \"lint_on_build\": true,\n    \"lint_specific\": {\n      \"mixed_case_exceptions\": [\n        \"ERC\",\n        \"URI\",\n        \"ID\",\n        \"URL\",\n        \"API\",\n        \"JSON\",\n        \"XML\",\n        \"HTML\",\n        \"HTTP\",\n        \"HTTPS\"\n      ],\n      \"multi_contract_file_exceptions\": []\n    }\n  },\n  \"doc\": {\n    \"out\": \"docs\",\n    \"title\": \"\",\n    \"book\": \"book.toml\",\n    \"homepage\": \"README.md\",\n    \"ignore\": []\n  },\n  \"bind_json\": {\n    \"out\": \"utils/JsonBindings.sol\",\n    \"include\": [],\n    \"exclude\": []\n  },\n  \"fs_permissions\": [],\n  \"isolate\": false,\n  \"disable_block_gas_limit\": false,\n  \"enable_tx_gas_limit\": false,\n  \"labels\": {},\n  \"unchecked_cheatcode_artifacts\": false,\n  \"create2_library_salt\": \"0x0000000000000000000000000000000000000000000000000000000000000000\",\n  \"create2_deployer\": \"0x4e59b44847b379578588920ca78fbf26c0b4956c\",\n  \"vyper\": {},\n  \"dependencies\": null,\n  \"soldeer\": null,\n  \"assertions_revert\": true,\n  \"legacy_assertions\": false,\n  \"network\": null,\n  \"celo\": false,\n  \"bypass_prevrandao\": false,\n  \"transaction_timeout\": 120,\n  \"additional_compiler_profiles\": [],\n  \"compilation_restrictions\": [],\n  \"script_execution_protection\": true\n}\n",
+        "stderr": ""
+      },
+      "build": {
+        "command": [
+          "forge",
+          "build",
+          "--offline",
+          "--use",
+          "/root/.local/share/svm/0.8.24/solc-0.8.24"
+        ],
+        "cwd": "$ISOLATED_PROJECT",
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "interrupted": false,
+        "outputLimited": false,
+        "spawnError": null,
+        "durationMs": 294,
+        "stdout": "Compiling 4 files with Solc 0.8.24\nSolc 0.8.24 finished in 258.63ms\nCompiler run successful!\n",
+        "stderr": ""
+      },
+      "test": {
+        "command": [
+          "forge",
+          "test",
+          "--offline",
+          "--use",
+          "/root/.local/share/svm/0.8.24/solc-0.8.24",
+          "--json",
+          "-vv",
+          "--match-path",
+          "test/final/*.t.sol",
+          "--fuzz-seed",
+          "0x5eed"
+        ],
+        "cwd": "$ISOLATED_PROJECT",
+        "exitCode": 0,
+        "signal": null,
+        "timedOut": false,
+        "interrupted": false,
+        "outputLimited": false,
+        "spawnError": null,
+        "durationMs": 779,
+        "stdout": "{\"test/final/RegistryFinal.t.sol:RegistryFinal\":{\"duration\":\"737ms 870µs 911ns\",\"test_results\":{\"testEveryBitBoundary()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":344860335}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"176ms 985µs 821ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFullWidthCounterexample()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000001000000000000000000000000000000070000000000000000000000000000000000000000000000000000000000000008696e736572746564000000000000000000000000000000000000000000000000\"},{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000010000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000056174283029000000000000000000000000000000000000000000000000000000\"}],\"decoded_logs\":[\"inserted: 340282366920938463463374607431768211463\",\"at(0): 340282366920938463463374607431768211463\"],\"kind\":{\"Unit\":{\"gas\":698691}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"137µs 880ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzFullWidth(uint256)\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":1120301,\"stipend\":21216},\"runs\":64,\"mean_gas\":1084482,\"median_gas\":1099085,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"36ms 822µs 525ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzSequence(uint256)\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":5193733,\"stipend\":21216},\"runs\":64,\"mean_gas\":5126671,\"median_gas\":5175613,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"518ms 894µs 806ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testPermissionlessCallers()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":501276}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"127µs 521ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusalBytesAndPrecedence()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":2241693}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"2ms 300µs 279ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSequences()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":1803300}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"2ms 157µs 440ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+        "stderr": ""
+      },
+      "parsed": {
+        "valid": true,
+        "executed": 7,
+        "tests": [
+          {
+            "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testEveryBitBoundary()",
+            "name": "testEveryBitBoundary()",
+            "status": "Success",
+            "reason": null,
+            "counterexample": null
+          },
+          {
+            "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFullWidthCounterexample()",
+            "name": "testFullWidthCounterexample()",
+            "status": "Success",
+            "reason": null,
+            "counterexample": null
+          },
+          {
+            "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzFullWidth(uint256)",
+            "name": "testFuzzFullWidth(uint256)",
+            "status": "Success",
+            "reason": null,
+            "counterexample": null
+          },
+          {
+            "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzSequence(uint256)",
+            "name": "testFuzzSequence(uint256)",
+            "status": "Success",
+            "reason": null,
+            "counterexample": null
+          },
+          {
+            "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testPermissionlessCallers()",
+            "name": "testPermissionlessCallers()",
+            "status": "Success",
+            "reason": null,
+            "counterexample": null
+          },
+          {
+            "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testRefusalBytesAndPrecedence()",
+            "name": "testRefusalBytesAndPrecedence()",
+            "status": "Success",
+            "reason": null,
+            "counterexample": null
+          },
+          {
+            "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testSequences()",
+            "name": "testSequences()",
+            "status": "Success",
+            "reason": null,
+            "counterexample": null
+          }
+        ],
+        "error": null
+      }
+    },
+    "mutations": [
+      {
+        "id": "capacity-overflow",
+        "definitionSha256": "f3c1be1c60c8fbd6d7b6025b736f559dbe65de9bdd9c1588f1b47f3bfb04a600",
+        "outcome": "killed",
+        "reason": "relevant explicit assertion failure",
+        "mutatedSourceSha256": "ac2162a530beafb94396d1553888f3bb51a4c6c4fffc2af038e87e878f55228b",
+        "build": {
+          "command": [
+            "forge",
+            "build",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 330,
+          "stdout": "Compiling 4 files with Solc 0.8.24\nSolc 0.8.24 finished in 287.38ms\nCompiler run successful!\n",
+          "stderr": ""
+        },
+        "test": {
+          "command": [
+            "forge",
+            "test",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--json",
+            "-vv",
+            "--match-path",
+            "test/final/*.t.sol",
+            "--fuzz-seed",
+            "0x5eed"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 270,
+          "stdout": "{\"test/final/RegistryFinal.t.sol:RegistryFinal\":{\"duration\":\"226ms 536µs 871ns\",\"test_results\":{\"testEveryBitBoundary()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":344914807}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"178ms 254µs 800ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFullWidthCounterexample()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000001000000000000000000000000000000070000000000000000000000000000000000000000000000000000000000000008696e736572746564000000000000000000000000000000000000000000000000\"},{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000010000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000056174283029000000000000000000000000000000000000000000000000000000\"}],\"decoded_logs\":[\"inserted: 340282366920938463463374607431768211463\",\"at(0): 340282366920938463463374607431768211463\"],\"kind\":{\"Unit\":{\"gas\":698894}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"145µs 500ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzFullWidth(uint256)\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":1120507,\"stipend\":21216},\"runs\":64,\"mean_gas\":1084688,\"median_gas\":1099291,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"37ms 514µs 935ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzSequence(uint256)\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:operation success or refusal\",\"counterexample\":{\"Single\":{\"warp\":null,\"roll\":null,\"sender\":null,\"addr\":null,\"calldata\":\"0x11411fe40000000000000000000000000000000000000000000000000000000000001285\",\"contract_name\":null,\"func_name\":null,\"signature\":null,\"args\":\"4741\",\"raw_args\":\"4741\"}},\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":0,\"stipend\":0},\"runs\":0,\"mean_gas\":0,\"median_gas\":0,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"6ms 913µs 107ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testPermissionlessCallers()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":501482}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"115µs 381ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusalBytesAndPrecedence()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:operation success or refusal\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":1714968}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"1ms 282µs 749ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSequences()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":1803518}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"1ms 841µs 249ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+          "stderr": ""
+        },
+        "parsed": {
+          "valid": true,
+          "executed": 7,
+          "tests": [
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testEveryBitBoundary()",
+              "name": "testEveryBitBoundary()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFullWidthCounterexample()",
+              "name": "testFullWidthCounterexample()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzFullWidth(uint256)",
+              "name": "testFuzzFullWidth(uint256)",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzSequence(uint256)",
+              "name": "testFuzzSequence(uint256)",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:operation success or refusal",
+              "counterexample": {
+                "Single": {
+                  "warp": null,
+                  "roll": null,
+                  "sender": null,
+                  "addr": null,
+                  "calldata": "0x11411fe40000000000000000000000000000000000000000000000000000000000001285",
+                  "contract_name": null,
+                  "func_name": null,
+                  "signature": null,
+                  "args": "4741",
+                  "raw_args": "4741"
+                }
+              }
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testPermissionlessCallers()",
+              "name": "testPermissionlessCallers()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testRefusalBytesAndPrecedence()",
+              "name": "testRefusalBytesAndPrecedence()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:operation success or refusal",
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testSequences()",
+              "name": "testSequences()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            }
+          ],
+          "error": null
+        },
+        "assertionTests": [
+          "test/final/RegistryFinal.t.sol:RegistryFinal::testRefusalBytesAndPrecedence()"
+        ]
+      },
+      {
+        "id": "unstable-delete",
+        "definitionSha256": "8c924aad691912705584cb9db17d3537dcaa94d6742a6fb82710541b3a93b23a",
+        "outcome": "killed",
+        "reason": "relevant explicit assertion failure",
+        "mutatedSourceSha256": "b1138d8f72361d75bbdcdfbbcb085562c16b7331749f5f5057e047a79f9b0ff4",
+        "build": {
+          "command": [
+            "forge",
+            "build",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 307,
+          "stdout": "Compiling 4 files with Solc 0.8.24\nSolc 0.8.24 finished in 269.16ms\nCompiler run successful!\n",
+          "stderr": ""
+        },
+        "test": {
+          "command": [
+            "forge",
+            "test",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--json",
+            "-vv",
+            "--match-path",
+            "test/final/*.t.sol",
+            "--fuzz-seed",
+            "0x5eed"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 263,
+          "stdout": "{\"test/final/RegistryFinal.t.sol:RegistryFinal\":{\"duration\":\"225ms 90µs 582ns\",\"test_results\":{\"testEveryBitBoundary()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":346020584}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"178ms 127µs 860ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFullWidthCounterexample()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000001000000000000000000000000000000070000000000000000000000000000000000000000000000000000000000000008696e736572746564000000000000000000000000000000000000000000000000\"},{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000010000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000056174283029000000000000000000000000000000000000000000000000000000\"}],\"decoded_logs\":[\"inserted: 340282366920938463463374607431768211463\",\"at(0): 340282366920938463463374607431768211463\"],\"kind\":{\"Unit\":{\"gas\":703100}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"160µs 209ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzFullWidth(uint256)\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":1124698,\"stipend\":21204},\"runs\":64,\"mean_gas\":1088891,\"median_gas\":1103494,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"36ms 170µs 356ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzSequence(uint256)\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:complete ordered array\",\"counterexample\":{\"Single\":{\"warp\":null,\"roll\":null,\"sender\":null,\"addr\":null,\"calldata\":\"0x11411fe40000000000000000000000000000000000000000000000000000000000000050\",\"contract_name\":null,\"func_name\":null,\"signature\":null,\"args\":\"80\",\"raw_args\":\"80\"}},\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":0,\"stipend\":0},\"runs\":0,\"mean_gas\":0,\"median_gas\":0,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"7ms 872µs 7ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testPermissionlessCallers()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":505688}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"85µs 690ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusalBytesAndPrecedence()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:complete ordered array\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":1918910}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"1ms 755µs 669ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSequences()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:complete ordered array\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":1313832}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"563µs 100ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+          "stderr": ""
+        },
+        "parsed": {
+          "valid": true,
+          "executed": 7,
+          "tests": [
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testEveryBitBoundary()",
+              "name": "testEveryBitBoundary()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFullWidthCounterexample()",
+              "name": "testFullWidthCounterexample()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzFullWidth(uint256)",
+              "name": "testFuzzFullWidth(uint256)",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzSequence(uint256)",
+              "name": "testFuzzSequence(uint256)",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:complete ordered array",
+              "counterexample": {
+                "Single": {
+                  "warp": null,
+                  "roll": null,
+                  "sender": null,
+                  "addr": null,
+                  "calldata": "0x11411fe40000000000000000000000000000000000000000000000000000000000000050",
+                  "contract_name": null,
+                  "func_name": null,
+                  "signature": null,
+                  "args": "80",
+                  "raw_args": "80"
+                }
+              }
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testPermissionlessCallers()",
+              "name": "testPermissionlessCallers()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testRefusalBytesAndPrecedence()",
+              "name": "testRefusalBytesAndPrecedence()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:complete ordered array",
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testSequences()",
+              "name": "testSequences()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:complete ordered array",
+              "counterexample": null
+            }
+          ],
+          "error": null
+        },
+        "assertionTests": [
+          "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzSequence(uint256)",
+          "test/final/RegistryFinal.t.sol:RegistryFinal::testSequences()"
+        ]
+      },
+      {
+        "id": "wrong-zero-error",
+        "definitionSha256": "38005bb2da4e528058fd2f6ecbd3e8332c321e5485d2b756819198a5403eb4e9",
+        "outcome": "killed",
+        "reason": "relevant explicit assertion failure",
+        "mutatedSourceSha256": "d8dcc7c9da9f61f10ad32b01d4b4e198d158f1d8318bf31bb76107d1bb64fb09",
+        "build": {
+          "command": [
+            "forge",
+            "build",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 297,
+          "stdout": "Compiling 4 files with Solc 0.8.24\nSolc 0.8.24 finished in 257.94ms\nCompiler run successful!\n",
+          "stderr": ""
+        },
+        "test": {
+          "command": [
+            "forge",
+            "test",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--json",
+            "-vv",
+            "--match-path",
+            "test/final/*.t.sol",
+            "--fuzz-seed",
+            "0x5eed"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 60,
+          "stdout": "{\"test/final/RegistryFinal.t.sol:RegistryFinal\":{\"duration\":\"18ms 36µs 923ns\",\"test_results\":{\"testEveryBitBoundary()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:exact refusal bytes or empty return\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":683828}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"267µs 120ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFullWidthCounterexample()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000001000000000000000000000000000000070000000000000000000000000000000000000000000000000000000000000008696e736572746564000000000000000000000000000000000000000000000000\"},{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000010000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000056174283029000000000000000000000000000000000000000000000000000000\"}],\"decoded_logs\":[\"inserted: 340282366920938463463374607431768211463\",\"at(0): 340282366920938463463374607431768211463\"],\"kind\":{\"Unit\":{\"gas\":699291}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"103µs 980ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzFullWidth(uint256)\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:exact refusal bytes or empty return\",\"counterexample\":{\"Single\":{\"warp\":null,\"roll\":null,\"sender\":null,\"addr\":null,\"calldata\":\"0x6eee7f120000000000000000000000000000000000000000000000000000000000000000\",\"contract_name\":null,\"func_name\":null,\"signature\":null,\"args\":\"0\",\"raw_args\":\"0\"}},\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":1121141,\"stipend\":21456},\"runs\":10,\"mean_gas\":1099685,\"median_gas\":1099685,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"8ms 149µs 397ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzSequence(uint256)\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:exact refusal bytes or empty return\",\"counterexample\":{\"Single\":{\"warp\":null,\"roll\":null,\"sender\":null,\"addr\":null,\"calldata\":\"0x11411fe400000000000000000000636f6d706c657465206f726465726564206172726179\",\"contract_name\":null,\"func_name\":null,\"signature\":null,\"args\":\"37203148965378265932029212702398847726095255276249465 [3.72e52]\",\"raw_args\":\"37203148965378265932029212702398847726095255276249465\"}},\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":0,\"stipend\":0},\"runs\":0,\"mean_gas\":0,\"median_gas\":0,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"6ms 873µs 447ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testPermissionlessCallers()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":501876}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"89µs 911ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusalBytesAndPrecedence()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:exact refusal bytes or empty return\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":798784}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"320µs 770ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSequences()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":1803900}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"1ms 739µs 11ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+          "stderr": ""
+        },
+        "parsed": {
+          "valid": true,
+          "executed": 7,
+          "tests": [
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testEveryBitBoundary()",
+              "name": "testEveryBitBoundary()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:exact refusal bytes or empty return",
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFullWidthCounterexample()",
+              "name": "testFullWidthCounterexample()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzFullWidth(uint256)",
+              "name": "testFuzzFullWidth(uint256)",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:exact refusal bytes or empty return",
+              "counterexample": {
+                "Single": {
+                  "warp": null,
+                  "roll": null,
+                  "sender": null,
+                  "addr": null,
+                  "calldata": "0x6eee7f120000000000000000000000000000000000000000000000000000000000000000",
+                  "contract_name": null,
+                  "func_name": null,
+                  "signature": null,
+                  "args": "0",
+                  "raw_args": "0"
+                }
+              }
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzSequence(uint256)",
+              "name": "testFuzzSequence(uint256)",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:exact refusal bytes or empty return",
+              "counterexample": {
+                "Single": {
+                  "warp": null,
+                  "roll": null,
+                  "sender": null,
+                  "addr": null,
+                  "calldata": "0x11411fe400000000000000000000636f6d706c657465206f726465726564206172726179",
+                  "contract_name": null,
+                  "func_name": null,
+                  "signature": null,
+                  "args": "37203148965378265932029212702398847726095255276249465 [3.72e52]",
+                  "raw_args": "37203148965378265932029212702398847726095255276249465"
+                }
+              }
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testPermissionlessCallers()",
+              "name": "testPermissionlessCallers()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testRefusalBytesAndPrecedence()",
+              "name": "testRefusalBytesAndPrecedence()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:exact refusal bytes or empty return",
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testSequences()",
+              "name": "testSequences()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            }
+          ],
+          "error": null
+        },
+        "assertionTests": [
+          "test/final/RegistryFinal.t.sol:RegistryFinal::testRefusalBytesAndPrecedence()"
+        ]
+      },
+      {
+        "id": "full-before-duplicate",
+        "definitionSha256": "b2838f01c14b3284c74699a49cdbd7dc4738b61562827424154dd21fd1fb6945",
+        "outcome": "killed",
+        "reason": "relevant explicit assertion failure",
+        "mutatedSourceSha256": "a7da722ff6e694a0ec788233c87457449a7afdc5f6b44d8d31a2260a0899bb56",
+        "build": {
+          "command": [
+            "forge",
+            "build",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 306,
+          "stdout": "Compiling 4 files with Solc 0.8.24\nSolc 0.8.24 finished in 268.97ms\nCompiler run successful!\n",
+          "stderr": ""
+        },
+        "test": {
+          "command": [
+            "forge",
+            "test",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--json",
+            "-vv",
+            "--match-path",
+            "test/final/*.t.sol",
+            "--fuzz-seed",
+            "0x5eed"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 264,
+          "stdout": "{\"test/final/RegistryFinal.t.sol:RegistryFinal\":{\"duration\":\"223ms 873µs 723ns\",\"test_results\":{\"testEveryBitBoundary()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":344860335}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"175ms 261µs 202ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFullWidthCounterexample()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000001000000000000000000000000000000070000000000000000000000000000000000000000000000000000000000000008696e736572746564000000000000000000000000000000000000000000000000\"},{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000010000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000056174283029000000000000000000000000000000000000000000000000000000\"}],\"decoded_logs\":[\"inserted: 340282366920938463463374607431768211463\",\"at(0): 340282366920938463463374607431768211463\"],\"kind\":{\"Unit\":{\"gas\":698691}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"164µs 391ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzFullWidth(uint256)\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":1120664,\"stipend\":21456},\"runs\":64,\"mean_gas\":1084598,\"median_gas\":1099208,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"36ms 2µs 536ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzSequence(uint256)\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:exact refusal bytes or empty return\",\"counterexample\":{\"Single\":{\"warp\":null,\"roll\":null,\"sender\":null,\"addr\":null,\"calldata\":\"0x11411fe400000000000000000000636f6d706c657465206f72646572656420617272617a\",\"contract_name\":null,\"func_name\":null,\"signature\":null,\"args\":\"37203148965378265932029212702398847726095255276249466 [3.72e52]\",\"raw_args\":\"37203148965378265932029212702398847726095255276249466\"}},\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":0,\"stipend\":0},\"runs\":0,\"mean_gas\":0,\"median_gas\":0,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"9ms 147µs 698ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testPermissionlessCallers()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":501276}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"120µs 939ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusalBytesAndPrecedence()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:exact refusal bytes or empty return\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":1565531}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"1ms 48µs 409ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSequences()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":1803300}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"1ms 658µs 70ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+          "stderr": ""
+        },
+        "parsed": {
+          "valid": true,
+          "executed": 7,
+          "tests": [
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testEveryBitBoundary()",
+              "name": "testEveryBitBoundary()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFullWidthCounterexample()",
+              "name": "testFullWidthCounterexample()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzFullWidth(uint256)",
+              "name": "testFuzzFullWidth(uint256)",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzSequence(uint256)",
+              "name": "testFuzzSequence(uint256)",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:exact refusal bytes or empty return",
+              "counterexample": {
+                "Single": {
+                  "warp": null,
+                  "roll": null,
+                  "sender": null,
+                  "addr": null,
+                  "calldata": "0x11411fe400000000000000000000636f6d706c657465206f72646572656420617272617a",
+                  "contract_name": null,
+                  "func_name": null,
+                  "signature": null,
+                  "args": "37203148965378265932029212702398847726095255276249466 [3.72e52]",
+                  "raw_args": "37203148965378265932029212702398847726095255276249466"
+                }
+              }
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testPermissionlessCallers()",
+              "name": "testPermissionlessCallers()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testRefusalBytesAndPrecedence()",
+              "name": "testRefusalBytesAndPrecedence()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:exact refusal bytes or empty return",
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testSequences()",
+              "name": "testSequences()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            }
+          ],
+          "error": null
+        },
+        "assertionTests": [
+          "test/final/RegistryFinal.t.sol:RegistryFinal::testRefusalBytesAndPrecedence()"
+        ]
+      },
+      {
+        "id": "stale-membership",
+        "definitionSha256": "e203e24958744595b41e0dc0c0639eeadd89de475e767b42f1df551619d57536",
+        "outcome": "killed",
+        "reason": "relevant explicit assertion failure",
+        "mutatedSourceSha256": "9d786c514f39669506c08da2812c1963644aafdd3a31798ffb50cb925db0cfe9",
+        "build": {
+          "command": [
+            "forge",
+            "build",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 305,
+          "stdout": "Compiling 4 files with Solc 0.8.24\nSolc 0.8.24 finished in 271.26ms\nCompiler run successful!\n",
+          "stderr": ""
+        },
+        "test": {
+          "command": [
+            "forge",
+            "test",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--json",
+            "-vv",
+            "--match-path",
+            "test/final/*.t.sol",
+            "--fuzz-seed",
+            "0x5eed"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 52,
+          "stdout": "{\"test/final/RegistryFinal.t.sol:RegistryFinal\":{\"duration\":\"14ms 702µs 955ns\",\"test_results\":{\"testEveryBitBoundary()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:touched or absent membership\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":1074746}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"618µs 990ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFullWidthCounterexample()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:remove full-width value\",\"counterexample\":null,\"logs\":[{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000001000000000000000000000000000000070000000000000000000000000000000000000000000000000000000000000008696e736572746564000000000000000000000000000000000000000000000000\"},{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000010000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000056174283029000000000000000000000000000000000000000000000000000000\"}],\"decoded_logs\":[\"inserted: 340282366920938463463374607431768211463\",\"at(0): 340282366920938463463374607431768211463\"],\"kind\":{\"Unit\":{\"gas\":759764}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"90µs 320ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzFullWidth(uint256)\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:touched or absent membership\",\"counterexample\":{\"Single\":{\"warp\":null,\"roll\":null,\"sender\":null,\"addr\":null,\"calldata\":\"0x6eee7f1200000000000000000000636f6d706c657465206f726465726564206172726178\",\"contract_name\":null,\"func_name\":null,\"signature\":null,\"args\":\"37203148965378265932029212702398847726095255276249464 [3.72e52]\",\"raw_args\":\"37203148965378265932029212702398847726095255276249464\"}},\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":0,\"stipend\":0},\"runs\":0,\"mean_gas\":0,\"median_gas\":0,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"2ms 458µs 788ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzSequence(uint256)\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:touched or absent membership\",\"counterexample\":{\"Single\":{\"warp\":null,\"roll\":null,\"sender\":null,\"addr\":null,\"calldata\":\"0x11411fe400000000000000000000636f6d706c657465206f726465726564206172726178\",\"contract_name\":null,\"func_name\":null,\"signature\":null,\"args\":\"37203148965378265932029212702398847726095255276249464 [3.72e52]\",\"raw_args\":\"37203148965378265932029212702398847726095255276249464\"}},\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":0,\"stipend\":0},\"runs\":0,\"mean_gas\":0,\"median_gas\":0,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"8ms 594µs 427ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testPermissionlessCallers()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:any caller may remove\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":553373}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"74µs 410ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusalBytesAndPrecedence()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:touched or absent membership\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":1953735}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"1ms 850µs 999ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSequences()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:touched or absent membership\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":1335894}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"621µs 459ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+          "stderr": ""
+        },
+        "parsed": {
+          "valid": true,
+          "executed": 7,
+          "tests": [
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testEveryBitBoundary()",
+              "name": "testEveryBitBoundary()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:touched or absent membership",
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFullWidthCounterexample()",
+              "name": "testFullWidthCounterexample()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:remove full-width value",
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzFullWidth(uint256)",
+              "name": "testFuzzFullWidth(uint256)",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:touched or absent membership",
+              "counterexample": {
+                "Single": {
+                  "warp": null,
+                  "roll": null,
+                  "sender": null,
+                  "addr": null,
+                  "calldata": "0x6eee7f1200000000000000000000636f6d706c657465206f726465726564206172726178",
+                  "contract_name": null,
+                  "func_name": null,
+                  "signature": null,
+                  "args": "37203148965378265932029212702398847726095255276249464 [3.72e52]",
+                  "raw_args": "37203148965378265932029212702398847726095255276249464"
+                }
+              }
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzSequence(uint256)",
+              "name": "testFuzzSequence(uint256)",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:touched or absent membership",
+              "counterexample": {
+                "Single": {
+                  "warp": null,
+                  "roll": null,
+                  "sender": null,
+                  "addr": null,
+                  "calldata": "0x11411fe400000000000000000000636f6d706c657465206f726465726564206172726178",
+                  "contract_name": null,
+                  "func_name": null,
+                  "signature": null,
+                  "args": "37203148965378265932029212702398847726095255276249464 [3.72e52]",
+                  "raw_args": "37203148965378265932029212702398847726095255276249464"
+                }
+              }
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testPermissionlessCallers()",
+              "name": "testPermissionlessCallers()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:any caller may remove",
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testRefusalBytesAndPrecedence()",
+              "name": "testRefusalBytesAndPrecedence()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:touched or absent membership",
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testSequences()",
+              "name": "testSequences()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:touched or absent membership",
+              "counterexample": null
+            }
+          ],
+          "error": null
+        },
+        "assertionTests": [
+          "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzSequence(uint256)",
+          "test/final/RegistryFinal.t.sol:RegistryFinal::testSequences()"
+        ]
+      },
+      {
+        "id": "truncate-128",
+        "definitionSha256": "20eab15973f620e3ec42021d72041830beb58127b850cb6e486f58a9aff1632c",
+        "outcome": "killed",
+        "reason": "relevant explicit assertion failure",
+        "mutatedSourceSha256": "e332b918770f4d31c00ad95c45a71a8fd8497b26223de1a48ee3ef9936570bde",
+        "build": {
+          "command": [
+            "forge",
+            "build",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 0,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 302,
+          "stdout": "Compiling 4 files with Solc 0.8.24\nSolc 0.8.24 finished in 265.52ms\nCompiler run successful!\n",
+          "stderr": "warning[unsafe-typecast]: typecasts that can truncate values should be checked\n   ╭▸ src/OrderedRegistry.sol:21:30\n   │\n21 │         entries.push(uint256(uint128(value)));\n   │                              ━━━━━━━━━━━━━━\n   │\n   ├ note: consider disabling this lint if you're certain the cast is safe\n   │       \n   │       // casting to 'uint128' is safe because [explain why]\n   │       // forge-lint: disable-next-line(unsafe-typecast)\n   │       \n   │       \n   ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#unsafe-typecast\n\n"
+        },
+        "test": {
+          "command": [
+            "forge",
+            "test",
+            "--offline",
+            "--use",
+            "/root/.local/share/svm/0.8.24/solc-0.8.24",
+            "--json",
+            "-vv",
+            "--match-path",
+            "test/final/*.t.sol",
+            "--fuzz-seed",
+            "0x5eed"
+          ],
+          "cwd": "$ISOLATED_PROJECT",
+          "exitCode": 1,
+          "signal": null,
+          "timedOut": false,
+          "interrupted": false,
+          "outputLimited": false,
+          "spawnError": null,
+          "durationMs": 147,
+          "stdout": "{\"test/final/RegistryFinal.t.sol:RegistryFinal\":{\"duration\":\"100ms 443µs 850ns\",\"test_results\":{\"testEveryBitBoundary()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:complete ordered array\",\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":181805360}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"90ms 109µs 684ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFullWidthCounterexample()\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:full-width counterexample: at(0) must not equal 7\",\"counterexample\":null,\"logs\":[{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000001000000000000000000000000000000070000000000000000000000000000000000000000000000000000000000000008696e736572746564000000000000000000000000000000000000000000000000\"},{\"address\":\"0x7fa9385be102ac3eac297483dd6233d62b3e1496\",\"topics\":[\"0xb2de2fbe801a0df6c0cbddfd448ba3c41d48a040ca35c56c8196ef0fcae721a8\"],\"data\":\"0x0000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000000700000000000000000000000000000000000000000000000000000000000000056174283029000000000000000000000000000000000000000000000000000000\"}],\"decoded_logs\":[\"inserted: 340282366920938463463374607431768211463\",\"at(0): 7\"],\"kind\":{\"Unit\":{\"gas\":755018}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"116µs 621ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzFullWidth(uint256)\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:complete ordered array\",\"counterexample\":{\"Single\":{\"warp\":null,\"roll\":null,\"sender\":null,\"addr\":null,\"calldata\":\"0x6eee7f1200000000000000000000000000000003d15165d65e64d827ab3a1d6962ca5b39\",\"contract_name\":null,\"func_name\":null,\"signature\":null,\"args\":\"1299078393434814380004300956350588541753 [1.299e39]\",\"raw_args\":\"1299078393434814380004300956350588541753\"}},\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":1124322,\"stipend\":21204},\"runs\":1,\"mean_gas\":1103118,\"median_gas\":1103118,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"3ms 66µs 728ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testFuzzSequence(uint256)\":{\"status\":\"Failure\",\"reason\":\"MTQ_ASSERT:complete ordered array\",\"counterexample\":{\"Single\":{\"warp\":null,\"roll\":null,\"sender\":null,\"addr\":null,\"calldata\":\"0x11411fe4000000000000000000000000000000000000000000000000000000000000004f\",\"contract_name\":null,\"func_name\":null,\"signature\":null,\"args\":\"79\",\"raw_args\":\"79\"}},\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Fuzz\":{\"first_case\":{\"gas\":0,\"stipend\":0},\"runs\":0,\"mean_gas\":0,\"median_gas\":0,\"failed_corpus_replays\":0}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"2ms 178µs 538ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testPermissionlessCallers()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":505312}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"84µs\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testRefusalBytesAndPrecedence()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":2245762}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"2ms 632µs 29ns\",\"breakpoints\":{},\"gas_snapshots\":{}},\"testSequences()\":{\"status\":\"Success\",\"reason\":null,\"counterexample\":null,\"logs\":[],\"decoded_logs\":[],\"kind\":{\"Unit\":{\"gas\":1807381}},\"traces\":[],\"labeled_addresses\":{},\"duration\":\"1ms 747µs 210ns\",\"breakpoints\":{},\"gas_snapshots\":{}}},\"warnings\":[]}}\n",
+          "stderr": ""
+        },
+        "parsed": {
+          "valid": true,
+          "executed": 7,
+          "tests": [
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testEveryBitBoundary()",
+              "name": "testEveryBitBoundary()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:complete ordered array",
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFullWidthCounterexample()",
+              "name": "testFullWidthCounterexample()",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:full-width counterexample: at(0) must not equal 7",
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzFullWidth(uint256)",
+              "name": "testFuzzFullWidth(uint256)",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:complete ordered array",
+              "counterexample": {
+                "Single": {
+                  "warp": null,
+                  "roll": null,
+                  "sender": null,
+                  "addr": null,
+                  "calldata": "0x6eee7f1200000000000000000000000000000003d15165d65e64d827ab3a1d6962ca5b39",
+                  "contract_name": null,
+                  "func_name": null,
+                  "signature": null,
+                  "args": "1299078393434814380004300956350588541753 [1.299e39]",
+                  "raw_args": "1299078393434814380004300956350588541753"
+                }
+              }
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzSequence(uint256)",
+              "name": "testFuzzSequence(uint256)",
+              "status": "Failure",
+              "reason": "MTQ_ASSERT:complete ordered array",
+              "counterexample": {
+                "Single": {
+                  "warp": null,
+                  "roll": null,
+                  "sender": null,
+                  "addr": null,
+                  "calldata": "0x11411fe4000000000000000000000000000000000000000000000000000000000000004f",
+                  "contract_name": null,
+                  "func_name": null,
+                  "signature": null,
+                  "args": "79",
+                  "raw_args": "79"
+                }
+              }
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testPermissionlessCallers()",
+              "name": "testPermissionlessCallers()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testRefusalBytesAndPrecedence()",
+              "name": "testRefusalBytesAndPrecedence()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            },
+            {
+              "id": "test/final/RegistryFinal.t.sol:RegistryFinal::testSequences()",
+              "name": "testSequences()",
+              "status": "Success",
+              "reason": null,
+              "counterexample": null
+            }
+          ],
+          "error": null
+        },
+        "assertionTests": [
+          "test/final/RegistryFinal.t.sol:RegistryFinal::testEveryBitBoundary()",
+          "test/final/RegistryFinal.t.sol:RegistryFinal::testFullWidthCounterexample()",
+          "test/final/RegistryFinal.t.sol:RegistryFinal::testFuzzFullWidth(uint256)"
+        ]
+      }
+    ],
+    "summary": {
+      "counts": {
+        "killed": 6,
+        "survived": 0,
+        "compile-error": 0,
+        "timeout": 0,
+        "infrastructure-error": 0,
+        "not-applicable": 0,
+        "equivalence-unresolved": 0
+      },
+      "total": 6,
+      "denominator": 6,
+      "excluded": 0,
+      "score": 1,
+      "formula": "killed / (killed + survived)",
+      "limitation": "Evidence about the declared mutations only; not proof of security or semantic equivalence."
+    },
+    "error": null
+  },
+  "comparison": {
+    "sourceUnchanged": true,
+    "initialTestsPreserved": true,
+    "manifestUnchanged": true,
+    "toolchainUnchanged": true
+  },
+  "disclosure": "Public author-written benchmark and tests. These measurements are self-reported, not independent, hidden, class-1 verified, or proof of security."
+}

@@ -1,0 +1,648 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:imd:measure-test-quality:report:1",
+  "title": "measure-test-quality report version 1",
+  "anyOf": [
+    {
+      "$ref": "#/$defs/campaign"
+    },
+    {
+      "$ref": "#/$defs/measurement"
+    }
+  ],
+  "$defs": {
+    "process": {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "cwd": {
+          "const": "$ISOLATED_PROJECT"
+        },
+        "exitCode": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "signal": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "timedOut": {
+          "type": "boolean"
+        },
+        "interrupted": {
+          "type": "boolean"
+        },
+        "outputLimited": {
+          "type": "boolean"
+        },
+        "spawnError": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "durationMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "stdout": {
+          "type": "string"
+        },
+        "stderr": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "command",
+        "cwd",
+        "exitCode",
+        "signal",
+        "timedOut",
+        "interrupted",
+        "outputLimited",
+        "spawnError",
+        "durationMs",
+        "stdout",
+        "stderr"
+      ],
+      "additionalProperties": false
+    },
+    "test": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "Success",
+            "Failure",
+            "Skipped"
+          ]
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "counterexample": {}
+      },
+      "required": [
+        "id",
+        "name",
+        "status",
+        "reason",
+        "counterexample"
+      ],
+      "additionalProperties": false
+    },
+    "parsed": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        },
+        "executed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/test"
+          }
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "valid",
+        "executed",
+        "tests",
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "file": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "source",
+            "test",
+            "support"
+          ]
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "path",
+        "role",
+        "sha256"
+      ],
+      "additionalProperties": false
+    },
+    "frozen": {
+      "type": "object",
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/file"
+          },
+          "minItems": 1
+        },
+        "projectSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "manifestSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "manifest": {
+          "type": "object"
+        },
+        "seed": {
+          "type": "string"
+        },
+        "matchPath": {
+          "type": "string"
+        },
+        "runnerSha256": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        },
+        "tools": {
+          "type": "object",
+          "properties": {
+            "node": {
+              "type": "string"
+            },
+            "forge": {
+              "$ref": "#/$defs/process"
+            },
+            "solc": {
+              "$ref": "#/$defs/process"
+            },
+            "solcBinarySha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "toolchainSha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "files",
+        "projectSha256",
+        "manifestSha256",
+        "manifest",
+        "seed",
+        "matchPath",
+        "runnerSha256",
+        "tools",
+        "toolchainSha256"
+      ],
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "counts": {
+          "type": "object",
+          "properties": {
+            "killed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "survived": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "compile-error": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "timeout": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "infrastructure-error": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not-applicable": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "equivalence-unresolved": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "killed",
+            "survived",
+            "compile-error",
+            "timeout",
+            "infrastructure-error",
+            "not-applicable",
+            "equivalence-unresolved"
+          ],
+          "additionalProperties": false
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "denominator": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "excluded": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "score": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "formula": {
+          "const": "killed / (killed + survived)"
+        },
+        "limitation": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "counts",
+        "total",
+        "denominator",
+        "excluded",
+        "score",
+        "formula",
+        "limitation"
+      ],
+      "additionalProperties": false
+    },
+    "mutant": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "definitionSha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "outcome": {
+          "enum": [
+            "killed",
+            "survived",
+            "compile-error",
+            "timeout",
+            "infrastructure-error",
+            "not-applicable",
+            "equivalence-unresolved"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "mutatedSourceSha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "build": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/process"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "test": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/process"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "parsed": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/parsed"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assertionTests": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "definitionSha256",
+        "outcome",
+        "reason",
+        "mutatedSourceSha256",
+        "build",
+        "test",
+        "parsed",
+        "assertionTests"
+      ],
+      "additionalProperties": false
+    },
+    "campaign": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "kind": {
+          "const": "campaign"
+        },
+        "startedAt": {
+          "type": "string"
+        },
+        "finishedAt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "invalid"
+          ]
+        },
+        "frozen": {
+          "$ref": "#/$defs/frozen"
+        },
+        "bounds": {
+          "type": "object",
+          "properties": {
+            "timeoutMs": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 120000
+            },
+            "campaignMs": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 600000
+            },
+            "maxMutations": {
+              "const": 32
+            }
+          },
+          "required": [
+            "timeoutMs",
+            "campaignMs",
+            "maxMutations"
+          ],
+          "additionalProperties": false
+        },
+        "baseline": {
+          "type": "object",
+          "properties": {
+            "valid": {
+              "type": "boolean"
+            },
+            "reason": {
+              "type": "string"
+            },
+            "config": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/process"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "build": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/process"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "test": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/process"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "parsed": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/parsed"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "valid",
+            "reason",
+            "config",
+            "build",
+            "test",
+            "parsed"
+          ],
+          "additionalProperties": false
+        },
+        "mutations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/mutant"
+          },
+          "minItems": 1,
+          "maxItems": 32
+        },
+        "summary": {
+          "$ref": "#/$defs/summary"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "version",
+        "kind",
+        "startedAt",
+        "finishedAt",
+        "status",
+        "frozen",
+        "bounds",
+        "baseline",
+        "mutations",
+        "summary",
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "measurement": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "kind": {
+          "const": "measurement"
+        },
+        "initial": {
+          "$ref": "#/$defs/campaign"
+        },
+        "final": {
+          "$ref": "#/$defs/campaign"
+        },
+        "comparison": {
+          "type": "object",
+          "properties": {
+            "sourceUnchanged": {
+              "const": true
+            },
+            "initialTestsPreserved": {
+              "const": true
+            },
+            "manifestUnchanged": {
+              "const": true
+            },
+            "toolchainUnchanged": {
+              "const": true
+            }
+          },
+          "required": [
+            "sourceUnchanged",
+            "initialTestsPreserved",
+            "manifestUnchanged",
+            "toolchainUnchanged"
+          ],
+          "additionalProperties": false
+        },
+        "disclosure": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "kind",
+        "initial",
+        "final",
+        "comparison",
+        "disclosure"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

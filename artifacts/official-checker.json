@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "referenceCommit": "fa541fd81326b532d315576fa113c78b67b30ca7",
+  "sourceUrl": "https://raw.githubusercontent.com/Identity-md/identitymd-skill-crafting/fa541fd81326b532d315576fa113c78b67b30ca7/check-skill.mjs",
+  "checkerSha256": "c4491e35c3d614af289baf2603f2ef604954fab90e9b37440c9682ddb6a0de25",
+  "unchanged": true,
+  "status": "passed",
+  "command": "node /tmp/imd-authoring-reference/check-skill.mjs measure-test-quality",
+  "exitCode": 0,
+  "output": "ok  measure-test-quality v1: tests, judge verifier-paths (class 2), checks none\n",
+  "inputs": [
+    {
+      "sha256": "23a321886058aaa2ef4f3f5374ae65c5df6a3ed27340804266dc66f5739b14b2",
+      "path": "/tmp/imd-authoring-reference/SKILL.md"
+    },
+    {
+      "sha256": "d230163c3af99553afccfe3aa910833081419a1ab773b143a3df0a5edb6a9cca",
+      "path": "/tmp/imd-authoring-reference/REFERENCE.md"
+    },
+    {
+      "sha256": "92c9edcbed9bca856ad0f264f1a5d0a357823d4398adc40b6afc6f02e47f6a87",
+      "path": "measure-test-quality/SKILL.md"
+    },
+    {
+      "sha256": "0e1e82f62fcc061881227461b52fec1d6516dc7e1a74dd609a188b674aeccf9f",
+      "path": "measure-test-quality/REFERENCE.md"
+    }
+  ],
+  "scope": "Official skill format validation only; not independent mutation replay or security review."
+}

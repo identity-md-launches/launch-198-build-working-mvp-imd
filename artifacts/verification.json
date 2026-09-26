@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "recordedAt": "2026-09-26T21:44:14.836Z",
+  "authority": "Local self-checks only; not independent verification.",
+  "checks": [
+    {
+      "id": "forge-build",
+      "command": "forge build",
+      "exitCode": 0,
+      "durationSeconds": 0.00000469,
+      "output": "No files changed, compilation skipped\n"
+    },
+    {
+      "id": "node-tests",
+      "command": "node --test measure-test-quality/scripts/*.test.mjs",
+      "exitCode": 0,
+      "durationSeconds": 5.972541918,
+      "output": "TAP version 13\n# Subtest: strict manifest fields, bounds, malformed values and CLI options\nok 1 - strict manifest fields, bounds, malformed values and CLI options\n  ---\n  duration_ms: 4.170608\n  type: 'test'\n  ...\n# Subtest: single exact replacement rejects missing, ambiguous, overlapping and no-op edits\nok 2 - single exact replacement rejects missing, ambiguous, overlapping and no-op edits\n  ---\n  duration_ms: 0.58971\n  type: 'test'\n  ...\n# Subtest: snapshot refuses file/directory symlinks, hardlinks and unsafe mutation paths\nok 3 - snapshot refuses file/directory symlinks, hardlinks and unsafe mutation paths\n  ---\n  duration_ms: 25.39913\n  type: 'test'\n  ...\n# Subtest: real Foundry: baseline, kills, survivors, source/test/config isolation and report integrity\nok 4 - real Foundry: baseline, kills, survivors, source/test/config isolation and report integrity\n  ---\n  duration_ms: 1320.745962\n  type: 'test'\n  ...\n# Subtest: real Foundry: compiler error is excluded; unexpected revert is unresolved, never killed\nok 5 - real Foundry: compiler error is excluded; unexpected revert is unresolved, never killed\n  ---\n  duration_ms: 421.263265\n  type: 'test'\n  ...\n# Subtest: real Foundry: empty and failing baselines invalidate a campaign\nok 6 - real Foundry: empty and failing baselines invalidate a campaign\n  ---\n  duration_ms: 463.766608\n  type: 'test'\n  ...\n# Subtest: missing forge and missing solc are recorded as invalid, with no kills\nok 7 - missing forge and missing solc are recorded as invalid, with no kills\n  ---\n  duration_ms: 49.584901\n  type: 'test'\n  ...\n# Subtest: real tool campaign deadline leaves honest partial/invalid evidence\nok 8 - real tool campaign deadline leaves honest partial/invalid evidence\n  ---\n  duration_ms: 42.237594\n  type: 'test'\n  ...\n# Subtest: real Foundry: a looping mutant times out and the campaign preserves unattempted work\nok 9 - real Foundry: a looping mutant times out and the campaign preserves unattempted work\n  ---\n  duration_ms: 2022.512537\n  type: 'test'\n  ...\n# Subtest: source edits cannot impersonate assertion markers\nok 10 - source edits cannot impersonate assertion markers\n  ---\n  duration_ms: 6.942178\n  type: 'test'\n  ...\n# Subtest: process timeout kills process group including a child; argument arrays do not expand shell syntax\nok 11 - process timeout kills process group including a child; argument arrays do not expand shell syntax\n  ---\n  duration_ms: 939.170342\n  type: 'test'\n  ...\n# Subtest: output cap, cancellation, crashes and malformed JSON are never assertion kills\nok 12 - output cap, cancellation, crashes and malformed JSON are never assertion kills\n  ---\n  duration_ms: 84.973016\n  type: 'test'\n  ...\n# Subtest: malformed JSON manifest and unsafe config fail before mutation execution\nok 13 - malformed JSON manifest and unsafe config fail before mutation execution\n  ---\n  duration_ms: 73.97712\n  type: 'test'\n  ...\n# Subtest: committed schema is exactly the portable schema exported through the pinned read\nok 14 - committed schema is exactly the portable schema exported through the pinned read\n  ---\n  duration_ms: 1.410129\n  type: 'test'\n  ...\n# Subtest: pinned-read transport works with only non-test sibling scripts\nok 15 - pinned-read transport works with only non-test sibling scripts\n  ---\n  duration_ms: 456.981159\n  type: 'test'\n  ...\n1..15\n# tests 15\n# suites 0\n# pass 15\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 6007.074504\n"
+    },
+    {
+      "id": "official-checker",
+      "command": "node /tmp/imd-authoring-reference/check-skill.mjs measure-test-quality",
+      "exitCode": 0,
+      "durationSeconds": 0.000005649,
+      "output": "ok  measure-test-quality v1: tests, judge verifier-paths (class 2), checks none\n"
+    },
+    {
+      "id": "forge-test",
+      "command": "forge test",
+      "exitCode": 0,
+      "durationSeconds": 0.590778089,
+      "output": "No files changed, compilation skipped\n\nRan 5 tests for test/initial/RegistryInitial.t.sol:RegistryInitial\n[PASS] testCapacity() (gas: 483793)\n[PASS] testRefusals() (gas: 276818)\n[PASS] testRemoveMembership() (gas: 348949)\n[PASS] testSmallValues() (gas: 345004)\n[PASS] testStableOrder() (gas: 448223)\nSuite result: ok. 5 passed; 0 failed; 0 skipped; finished in 670.19µs (358.10µs CPU time)\n\nRan 7 tests for test/final/RegistryFinal.t.sol:RegistryFinal\n[PASS] testEveryBitBoundary() (gas: 344860335)\n[PASS] testFullWidthCounterexample() (gas: 698691)\n[PASS] testFuzzFullWidth(uint256) (runs: 64, μ: 1084482, ~: 1099085)\n[PASS] testFuzzSequence(uint256) (runs: 64, μ: 5130661, ~: 5175613)\n[PASS] testPermissionlessCallers() (gas: 501276)\n[PASS] testRefusalBytesAndPrecedence() (gas: 2241693)\n[PASS] testSequences() (gas: 1803300)\nSuite result: ok. 7 passed; 0 failed; 0 skipped; finished in 607.91ms (864.99ms CPU time)\n\nRan 2 test suites in 612.37ms (608.58ms CPU time): 12 tests passed, 0 failed, 0 skipped (12 total tests)\n"
+    },
+    {
+      "id": "forge-fmt",
+      "command": "forge fmt --check",
+      "exitCode": 0,
+      "durationSeconds": 0.00000445,
+      "output": ""
+    },
+    {
+      "id": "report-validation",
+      "command": "node measure-test-quality/scripts/validate.mjs artifacts/measurement.json --project . --manifest manifests/registry-v1.json",
+      "exitCode": 0,
+      "durationSeconds": 0.10438172,
+      "output": "valid report v1: artifacts/measurement.json\n"
+    },
+    {
+      "id": "both-campaigns",
+      "command": "node scripts/reproduce.mjs --out /tmp/mtq-final-evidence",
+      "exitCode": 0,
+      "durationSeconds": 5.334812139,
+      "output": "initial 4/6, final 6/6; reports: /tmp/mtq-final-evidence\n"
+    },
+    {
+      "id": "historical-pilot-replay",
+      "command": "node scripts/replay-pilot.mjs --out /tmp/mtq-pilot-final-replay.json",
+      "exitCode": 0,
+      "output": "historical pilot reproduced: 4/6 kills; source, manifest, runner and toolchain hashes match\n"
+    },
+    {
+      "id": "compare-cli",
+      "command": "node measure-test-quality/scripts/compare.mjs artifacts/initial.json artifacts/final.json /tmp/mtq-cli-comparison.json /tmp/mtq-cli-comparison.md",
+      "exitCode": 0,
+      "durationSeconds": 0.02638973,
+      "output": ""
+    },
+    {
+      "id": "pilot-report-validation",
+      "command": "node measure-test-quality/scripts/validate.mjs /tmp/mtq-pilot-final-replay.json --project . --manifest manifests/registry-v1.json",
+      "exitCode": 0,
+      "durationSeconds": 0.00043052,
+      "output": "valid report v1: /tmp/mtq-pilot-final-replay.json\n"
+    },
+    {
+      "id": "delivery-integrity",
+      "command": "node --input-type=module - <<'JS'\nimport fs from 'node:fs/promises';\nimport {hash} from './measure-test-quality/scripts/core.mjs';\nconst r=JSON.parse(await fs.readFile('artifacts/measurement.json'));\nfor(const stage of ['initial','final']) for(const [name,expected] of Object.entries(r[stage].frozen.runnerSha256)) {\n if(hash(await fs.readFile('measure-test-quality/scripts/'+name))!==expected) throw new Error('runner changed: '+name);\n}\nconst official=JSON.parse(await fs.readFile('artifacts/official-checker.json'));\nfor(const i of official.inputs.filter(i=>i.path.startsWith('measure-test-quality/'))) if(hash(await fs.readFile(i.path))!==i.sha256) throw new Error('checked skill changed');\nconsole.log('Current runner hashes match both campaigns; skill/reference hashes match official validation.');\nJS",
+      "exitCode": 0,
+      "durationSeconds": 0.00000323,
+      "output": "Current runner hashes match both campaigns; skill/reference hashes match official validation.\n"
+    }
+  ],
+  "publication": {
+    "status": "pending",
+    "reason": "No GitHub destination or authorized publishing channel was supplied; task prohibits credentials, external services and touching .git/."
+  },
+  "independentReview": "not performed; checklist in docs/REVIEW.md"
+}

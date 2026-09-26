@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "mutation": "truncate-128",
+  "definitionSha256": "20eab15973f620e3ec42021d72041830beb58127b850cb6e486f58a9aff1632c",
+  "initialOutcome": "survived",
+  "call": "insert((uint256(1) << 128) + 7), then at(0)",
+  "honest": {
+    "status": "Success",
+    "logs": [
+      "inserted: 340282366920938463463374607431768211463",
+      "at(0): 340282366920938463463374607431768211463"
+    ]
+  },
+  "mutated": {
+    "status": "Failure",
+    "reason": "MTQ_ASSERT:full-width counterexample: at(0) must not equal 7",
+    "logs": [
+      "inserted: 340282366920938463463374607431768211463",
+      "at(0): 7"
+    ]
+  }
+}

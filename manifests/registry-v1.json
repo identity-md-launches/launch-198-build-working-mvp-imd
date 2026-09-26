@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "provenance": {
+    "author": "measure-test-quality benchmark author",
+    "origin": "public author-written standalone benchmark; not independent or held out",
+    "createdAt": "2026-09-26T00:00:00Z",
+    "description": "Six non-equivalent single-site defects selected before the initial campaign."
+  },
+  "sourceRoots": [
+    "src"
+  ],
+  "testRoots": [
+    "test"
+  ],
+  "supportPaths": [
+    "foundry.toml"
+  ],
+  "mutations": [
+    {
+      "id": "capacity-overflow",
+      "path": "src/OrderedRegistry.sol",
+      "before": "if (entries.length >= CAPACITY)",
+      "after": "if (entries.length > CAPACITY)",
+      "category": "capacity-boundary",
+      "rationale": "Accepts a fifth entry past the bound.",
+      "relevantTests": [
+        "testCapacity()",
+        "testRefusalBytesAndPrecedence()"
+      ]
+    },
+    {
+      "id": "unstable-delete",
+      "path": "src/OrderedRegistry.sol",
+      "before": "entries[j] = entries[j + 1];",
+      "after": "entries[j] = entries[entries.length - 1];",
+      "category": "ordering",
+      "rationale": "Replaces shifted entries with the last entry, breaking stable order.",
+      "relevantTests": [
+        "testStableOrder()",
+        "testSequences()",
+        "testFuzzSequence(uint256)"
+      ]
+    },
+    {
+      "id": "wrong-zero-error",
+      "path": "src/OrderedRegistry.sol",
+      "before": "if (value == 0) revert ZeroValue();",
+      "after": "if (value == 0) revert Missing(value);",
+      "category": "wrong-error",
+      "rationale": "Returns the wrong refusal selector for zero.",
+      "relevantTests": [
+        "testRefusals()",
+        "testRefusalBytesAndPrecedence()"
+      ]
+    },
+    {
+      "id": "full-before-duplicate",
+      "path": "src/OrderedRegistry.sol",
+      "before": "if (present[value]) revert AlreadyPresent(value);\n        if (entries.length >= CAPACITY) revert Full(CAPACITY);",
+      "after": "if (entries.length >= CAPACITY) revert Full(CAPACITY);\n        if (present[value]) revert AlreadyPresent(value);",
+      "category": "error-precedence",
+      "rationale": "Reports Full instead of AlreadyPresent for duplicate insertion when full.",
+      "relevantTests": [
+        "testRefusalBytesAndPrecedence()"
+      ]
+    },
+    {
+      "id": "stale-membership",
+      "path": "src/OrderedRegistry.sol",
+      "before": "delete present[value];",
+      "after": "present[value] = true;",
+      "category": "stale-state",
+      "rationale": "Leaves removed values marked present.",
+      "relevantTests": [
+        "testRemoveMembership()",
+        "testSequences()",
+        "testFuzzSequence(uint256)"
+      ]
+    },
+    {
+      "id": "truncate-128",
+      "path": "src/OrderedRegistry.sol",
+      "before": "entries.push(value);",
+      "after": "entries.push(uint256(uint128(value)));",
+      "category": "truncation",
+      "rationale": "Truncates observable entries to 128 bits while membership uses 256 bits.",
+      "relevantTests": [
+        "testSmallValues()",
+        "testFullWidthCounterexample()",
+        "testEveryBitBoundary()",
+        "testFuzzFullWidth(uint256)"
+      ]
+    }
+  ]
+}
